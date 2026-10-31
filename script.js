@@ -10781,20 +10781,23 @@ window.closeSFResult = function() {
 };
 // 切换 Tab
 window.switchSFTab = function(tabName, element) {
-    // 1. 切换按钮的高亮状态
     document.querySelectorAll('.sf-tab').forEach(t => t.classList.remove('active'));
     if(element) element.classList.add('active');
 
-    // 2. 切换界面显示
-    document.getElementById('sfGachaScreen').style.display = 'none';
-    document.getElementById('sfResultScreen').style.display = 'none';
-    document.getElementById('sfRosterScreen').style.display = 'none';
+    const gachaScreen = document.getElementById('sfGachaScreen');
+    const resultScreen = document.getElementById('sfResultScreen');
+    const rosterScreen = document.getElementById('sfRosterScreen');
 
-    if (tabName === 'gacha') {
-        document.getElementById('sfGachaScreen').style.display = 'flex';
-    } else if (tabName === 'roster') {
-        document.getElementById('sfRosterScreen').style.display = 'flex';
-        renderSFRoster(); // 渲染名册
+    // 核心修复：先判断元素存不存在，再隐藏，防止报错
+    if (gachaScreen) gachaScreen.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'none';
+    if (rosterScreen) rosterScreen.style.display = 'none';
+
+    if (tabName === 'gacha' && gachaScreen) {
+        gachaScreen.style.display = 'flex';
+    } else if (tabName === 'roster' && rosterScreen) {
+        rosterScreen.style.display = 'flex';
+        renderSFRoster();
     }
 };
 

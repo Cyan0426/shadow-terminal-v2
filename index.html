@@ -1974,13 +1974,15 @@
             距离 SSR 保底：<span id="sfPityDisplay" style="color: var(--gold);">80</span> 抽
         </div>
     </div>
-<!-- 页面切换 Tab -->
-<div class="sf-tabs">
-    <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
-    <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
-</div>
+
+    <!-- 页面切换 Tab -->
+    <div class="sf-tabs">
+        <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
+        <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
+    </div>
+
     <!-- 抽卡主界面 -->
-    <div class="sf-gacha-screen" id="sfGachaScreen">
+    <div class="sf-gacha-screen" id="sfGachaScreen" style="display: flex;">
         <div class="sf-banner">
             <div class="sf-banner-title">暗影精英招募</div>
             <div class="sf-banner-desc">招募顶尖特种干员，扩充你的私人武装。</div>
@@ -1999,11 +2001,13 @@
         </div>
         <button class="sf-btn-secondary" onclick="closeSFResult()">确 认 入 库</button>
     </div>
-    <!-- 页面切换 Tab -->
-<div class="sf-tabs">
-    <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
-    <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
-</div>
+
+    <!-- 干员名册界面 (默认隐藏) -->
+    <div class="sf-roster-screen" id="sfRosterScreen" style="display: none;">
+        <div class="sf-result-list" id="sfRosterList">
+            <!-- 名册列表由 JS 渲染 -->
+        </div>
+    </div>
 </div>
 <script src="script.js"></script>
 </body>
