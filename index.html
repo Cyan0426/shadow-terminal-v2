@@ -1964,7 +1964,7 @@
 <div class="sf-overlay" id="sfOverlay">
     <div class="sf-header">
         <div class="sf-title">特种部队 · SF COMMAND</div>
-        <div class="sf-close" onclick="closeSFCommand()">?</div>
+        <div class="sf-close" onclick="closeSFCommand()">X</div>
     </div>
 
     <!-- 资金与保底状态栏 -->
@@ -1974,7 +1974,11 @@
             距离 SSR 保底：<span id="sfPityDisplay" style="color: var(--gold);">80</span> 抽
         </div>
     </div>
-
+<!-- 页面切换 Tab -->
+<div class="sf-tabs">
+    <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
+    <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
+</div>
     <!-- 抽卡主界面 -->
     <div class="sf-gacha-screen" id="sfGachaScreen">
         <div class="sf-banner">
@@ -1995,6 +1999,11 @@
         </div>
         <button class="sf-btn-secondary" onclick="closeSFResult()">确 认 入 库</button>
     </div>
+    <!-- 页面切换 Tab -->
+<div class="sf-tabs">
+    <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
+    <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
+</div>
 </div>
 <script src="script.js"></script>
 </body>

@@ -10779,3 +10779,72 @@ window.closeSFResult = function() {
     document.getElementById('sfGachaScreen').style.display = 'flex';
     updateSFUI();
 };
+// 切换 Tab
+window.switchSFTab = function(tabName, element) {
+    // 1. 切换按钮的高亮状态
+    document.querySelectorAll('.sf-tab').forEach(t => t.classList.remove('active'));
+    if(element) element.classList.add('active');
+
+    // 2. 切换界面显示
+    document.getElementById('sfGachaScreen').style.display = 'none';
+    document.getElementById('sfResultScreen').style.display = 'none';
+    document.getElementById('sfRosterScreen').style.display = 'none';
+
+    if (tabName === 'gacha') {
+        document.getElementById('sfGachaScreen').style.display = 'flex';
+    } else if (tabName === 'roster') {
+        document.getElementById('sfRosterScreen').style.display = 'flex';
+        renderSFRoster(); // 渲染名册
+    }
+};
+
+// 渲染干员名册
+function renderSFRoster() {
+    const listEl = document.getElementById('sfRosterList');
+    if (!listEl) return;
+    
+    // 重新从本地读取最新数据
+    sfRoster = JSON.parse(localStorage.getItem('sf_roster')) || [];
+    
+    if (sfRoster.length === 0) {
+        listEl.innerHTML = '<div style="grid-column: span 2; text-align: center; color: var(--text-muted); padding: 30px;">暂无干员，请先去招募。</div>';
+        return;
+    }
+
+    // 按照 稀有度 排序 (SSR -> SR -> R)
+    const rankWeight = { 'SSR': 3, 'SR': 2, 'R': 1 };
+    sfRoster.sort((a, b) => rankWeight[b.rank] - rankWeight[a.rank]);
+
+    listEl.innerHTML = '';
+    sfRoster.forEach((agent, index) => {
+        const card = document.createElement('div');
+        card.className = `sf-card ${agent.rank}`;
+        
+        // 以后这里可以点击查看详情，现在我们先把数据展示出来
+        card.innerHTML = `
+            <div class="sf-card-header">
+                <div class="sf-card-name">${agent.name}</div>
+                <div class="sf-card-rank">${agent.rank}</div>
+            </div>
+            <div class="sf-card-stats">
+                等级: <span>Lv.${agent.level}</span><br>
+                火力: <span>${agent.fire}</span> | 隐蔽: <span>${agent.stealth}</span><br>
+                生存: <span>${agent.survive}</span> | 战术: <span>${agent.tactic}</span>
+            </div>
+        `;
+        listEl.appendChild(card);
+    });
+}
+
+// 修改一下之前的 closeSFResult 函数，让它回到招募中心，并清理状态
+window.closeSFResult = function() {
+    document.getElementById('sfResultScreen').style.display = 'none';
+    document.getElementById('sfGachaScreen').style.display = 'flex';
+    // 保证 Tab 高亮正确
+    const tabs = document.querySelectorAll('.sf-tab');
+    if (tabs.length > 0) {
+        tabs[0].classList.add('active');
+        tabs[1].classList.remove('active');
+    }
+    updateSFUI();
+};
