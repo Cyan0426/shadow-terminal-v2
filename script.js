@@ -10615,3 +10615,167 @@ window.closeTravel = function() {
     loadTravelData();
     updateTravelStats();
 })(); // 👈 关键点：如果你发现文件最后没有这行，把它加上！
+
+/* ================= 特种部队 · 抽卡逻辑 ================= */
+
+// 干员数据池
+const SF_AGENTS_POOL = [
+    // R 级 (普通)
+    { id: 'r1', name: '新兵-01', rank: 'R', fire: 10, stealth: 10, survive: 10, tactic: 10, maxLv: 40 },
+    { id: 'r2', name: '新兵-02', rank: 'R', fire: 12, stealth: 8, survive: 12, tactic: 8, maxLv: 40 },
+    { id: 'r3', name: '侦察兵', rank: 'R', fire: 8, stealth: 15, survive: 9, tactic: 10, maxLv: 40 },
+    // SR 级 (精锐)
+    { id: 'sr1', name: '游骑兵', rank: 'SR', fire: 25, stealth: 20, survive: 25, tactic: 20, maxLv: 60 },
+    { id: 'sr2', name: '幽灵', rank: 'SR', fire: 20, stealth: 30, survive: 20, tactic: 20, maxLv: 60 },
+    { id: 'sr3', name: '重装兵', rank: 'SR', fire: 30, stealth: 10, survive: 35, tactic: 15, maxLv: 60 },
+    // SSR 级 (传说)
+    { id: 'ssr1', name: '猎鹰 (Falcon)', rank: 'SSR', fire: 50, stealth: 40, survive: 40, tactic: 50, maxLv: 80 },
+    { id: 'ssr2', name: '毒蛇 (Viper)', rank: 'SSR', fire: 40, stealth: 60, survive: 30, tactic: 50, maxLv: 80 },
+    { id: 'ssr3', name: '铁锤 (Hammer)', rank: 'SSR', fire: 60, stealth: 30, survive: 50, tactic: 40, maxLv: 80 }
+];
+
+// 抽卡状态
+let sfPityCount = parseInt(localStorage.getItem('sf_pity')) || 0; // 距离上次出SSR的抽数
+let sfRoster = JSON.parse(localStorage.getItem('sf_roster')) || []; // 玩家已拥有的干员
+
+// 打开/关闭界面
+window.openSFCommand = function() {
+    if (typeof closeAllOverlays === 'function') closeAllOverlays();
+    if (typeof closeAppCenter === 'function') closeAppCenter();
+    
+    const overlay = document.getElementById('sfOverlay');
+    if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
+    
+    overlay.classList.add('active');
+    overlay.style.display = 'flex';
+    
+    // 重置界面状态
+    document.getElementById('sfGachaScreen').style.display = 'flex';
+    document.getElementById('sfResultScreen').style.display = 'none';
+    
+    updateSFUI();
+};
+
+window.closeSFCommand = function() {
+    const overlay = document.getElementById('sfOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        overlay.style.display = 'none';
+    }
+};
+
+// 更新UI数据（资金与保底）
+function updateSFUI() {
+    const fundsDisplay = document.getElementById('sfFundsDisplay');
+    if (fundsDisplay && typeof dispatchFunds !== 'undefined') {
+        fundsDisplay.textContent = '$' + dispatchFunds.toLocaleString('en-US');
+    }
+    const pityDisplay = document.getElementById('sfPityDisplay');
+    if (pityDisplay) {
+        pityDisplay.textContent = 80 - sfPityCount;
+    }
+}
+
+// 核心抽卡函数
+window.pullSFAgent = function(count) {
+    const cost = 500000 * count;
+    
+    // 检查资金
+    if (typeof dispatchFunds === 'undefined' || dispatchFunds < cost) {
+        alert(`行动资金不足！\\\\n\\\\n本次招募需要 $${cost.toLocaleString('en-US')}，你当前只有 $${dispatchFunds.toLocaleString('en-US')}。\\\\n请去玩玩小游戏或暗影操盘赚点钱。`);
+        return;
+    }
+    
+    // 扣除资金
+    dispatchFunds -= cost;
+    if (typeof renderDispatchFunds === 'function') renderDispatchFunds();
+    if (typeof saveGameState === 'function') saveGameState();
+    
+    let results = [];
+    let gotSR = false;
+    let gotSSR = false;
+    
+    // 开始抽卡
+    for (let i = 0; i < count; i++) {
+        sfPityCount++;
+        let roll = Math.random() * 100;
+        let selectedRank = 'R';
+        
+        // 1. 判定 80 抽大保底
+        if (sfPityCount >= 80) {
+            selectedRank = 'SSR';
+            sfPityCount = 0; // 重置保底
+        } 
+        // 2. 正常概率判定 (SSR 5%, SR 25%, R 70%)
+        else if (roll < 5) {
+            selectedRank = 'SSR';
+            sfPityCount = 0;
+        } else if (roll < 30) {
+            selectedRank = 'SR';
+        }
+        
+        // 如果是十连的最后一抽，并且前面没出过 SR/SSR，强制给 SR
+        if (count === 10 && i === 9 && !gotSR && !gotSSR) {
+            selectedRank = 'SR';
+        }
+        
+        if (selectedRank === 'SR') gotSR = true;
+        if (selectedRank === 'SSR') gotSSR = true;
+        
+        // 从池子里随机挑一个对应稀有度的干员
+        const pool = SF_AGENTS_POOL.filter(a => a.rank === selectedRank);
+        const agent = pool[Math.floor(Math.random() * pool.length)];
+        
+        // 深拷贝一份，方便以后培养加等级
+        results.push({...agent, level: 1, exp: 0, uid: Date.now() + i}); 
+    }
+    
+    // 保存保底进度
+    localStorage.setItem('sf_pity', sfPityCount.toString());
+    
+    // 展示结果
+    showSFResults(results);
+};
+
+// 展示抽卡结果
+function showSFResults(results) {
+    document.getElementById('sfGachaScreen').style.display = 'none';
+    document.getElementById('sfResultScreen').style.display = 'flex';
+    
+    const listEl = document.getElementById('sfResultList');
+    listEl.innerHTML = '';
+    
+    // 保存进仓库
+    results.forEach((agent, index) => {
+        sfRoster.push(agent); // 待会儿写仓库系统时用
+        
+        // 渲染UI
+        const card = document.createElement('div');
+        card.className = `sf-card ${agent.rank}`;
+        // 动画延迟，逐个弹出
+        card.style.animationDelay = `${index * 0.1}s`;
+        
+        card.innerHTML = `
+            <div class="sf-card-header">
+                <div class="sf-card-name">${agent.name}</div>
+                <div class="sf-card-rank">${agent.rank}</div>
+            </div>
+            <div class="sf-card-stats">
+                火力: <span>${agent.fire}</span> | 隐蔽: <span>${agent.stealth}</span><br>
+                生存: <span>${agent.survive}</span> | 战术: <span>${agent.tactic}</span><br>
+                上限: <span>Lv.${agent.maxLv}</span>
+            </div>
+        `;
+        listEl.appendChild(card);
+    });
+    
+    // 存入本地存档
+    localStorage.setItem('sf_roster', JSON.stringify(sfRoster));
+}
+
+// 关闭结果并返回抽卡界面
+window.closeSFResult = function() {
+    document.getElementById('sfResultScreen').style.display = 'none';
+    document.getElementById('sfGachaScreen').style.display = 'flex';
+    updateSFUI();
+};

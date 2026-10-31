@@ -991,6 +991,7 @@
         <div class="app-icon-item" onclick="openShadowRunner()"><div class="app-icon">🏃‍♂️</div><div class="app-name">暗影突进</div></div>
         <div class="app-icon-item" onclick="openMusicPlayer()"><div class="app-icon">📻</div><div class="app-name">加密电台</div></div>
         <div class="app-icon-item" onclick="openShadowRush()"><div class="app-icon">🏎️</div><div class="app-name">暗影极速</div></div>
+        <div class="app-icon-item" onclick="openSFCommand()"><div class="app-icon">🪖</div><div class="app-name">特种部队</div></div>
 </div>
 </div>
 
@@ -1957,7 +1958,42 @@
         <button class="tvh-continue" onclick="closeTravelHidden()">收 下</button>
     </div>
 </div>
+<!-- ================= 特种部队 · 招募与指挥中心 ================= -->
+<div class="sf-overlay" id="sfOverlay">
+    <div class="sf-header">
+        <div class="sf-title">特种部队 · SF COMMAND</div>
+        <div class="sf-close" onclick="closeSFCommand()">?</div>
+    </div>
 
+    <!-- 资金与保底状态栏 -->
+    <div class="sf-status-bar">
+        <div>行动资金：<span id="sfFundsDisplay" style="color: var(--gold); font-weight: bold;">$0</span></div>
+        <div style="font-size: 11px; color: var(--text-muted);">
+            距离 SSR 保底：<span id="sfPityDisplay" style="color: var(--gold);">80</span> 抽
+        </div>
+    </div>
+
+    <!-- 抽卡主界面 -->
+    <div class="sf-gacha-screen" id="sfGachaScreen">
+        <div class="sf-banner">
+            <div class="sf-banner-title">暗影精英招募</div>
+            <div class="sf-banner-desc">招募顶尖特种干员，扩充你的私人武装。</div>
+        </div>
+        
+        <div class="sf-pull-buttons">
+            <button class="sf-btn-primary" onclick="pullSFAgent(1)">单次招募<br><span>$500,000</span></button>
+            <button class="sf-btn-primary" onclick="pullSFAgent(10)">十连招募<br><span>$5,000,000</span></button>
+        </div>
+    </div>
+
+    <!-- 抽卡结果展示区 (默认隐藏) -->
+    <div class="sf-result-screen" id="sfResultScreen" style="display: none;">
+        <div class="sf-result-list" id="sfResultList">
+            <!-- 抽卡结果由 JS 动态渲染 -->
+        </div>
+        <button class="sf-btn-secondary" onclick="closeSFResult()">确 认 入 库</button>
+    </div>
+</div>
 <script src="script.js"></script>
 </body>
 </html>
