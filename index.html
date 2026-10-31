@@ -1970,22 +1970,20 @@
     <!-- 资金与保底状态栏 -->
     <div class="sf-status-bar">
         <div>行动资金：<span id="sfFundsDisplay" style="color: var(--gold); font-weight: bold;">$0</span></div>
-        <div style="font-size: 11px; color: var(--text-muted);">
-            距离 SSR 保底：<span id="sfPityDisplay" style="color: var(--gold);">80</span> 抽
-        </div>
     </div>
 
     <!-- 页面切换 Tab -->
     <div class="sf-tabs">
         <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
         <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
+        <div class="sf-tab" onclick="switchSFTab('mission', this)">特种行动</div>
     </div>
 
-    <!-- 抽卡主界面 -->
+    <!-- 界面 1：抽卡主界面 -->
     <div class="sf-gacha-screen" id="sfGachaScreen" style="display: flex;">
         <div class="sf-banner">
             <div class="sf-banner-title">暗影精英招募</div>
-            <div class="sf-banner-desc">招募顶尖特种干员，扩充你的私人武装。</div>
+            <div class="sf-banner-desc">距离 SSR 保底：<span id="sfPityDisplay" style="color: var(--gold);">80</span> 抽</div>
         </div>
         
         <div class="sf-pull-buttons">
@@ -1994,18 +1992,21 @@
         </div>
     </div>
 
-    <!-- 抽卡结果展示区 (默认隐藏) -->
+    <!-- 界面 2：抽卡结果展示区 (默认隐藏) -->
     <div class="sf-result-screen" id="sfResultScreen" style="display: none;">
-        <div class="sf-result-list" id="sfResultList">
-            <!-- 抽卡结果由 JS 动态渲染 -->
-        </div>
+        <div class="sf-result-list" id="sfResultList"></div>
         <button class="sf-btn-secondary" onclick="closeSFResult()">确 认 入 库</button>
     </div>
 
-    <!-- 干员名册界面 (默认隐藏) -->
+    <!-- 界面 3：干员名册 (默认隐藏) -->
     <div class="sf-roster-screen" id="sfRosterScreen" style="display: none;">
-        <div class="sf-result-list" id="sfRosterList">
-            <!-- 名册列表由 JS 渲染 -->
+        <div class="sf-result-list" id="sfRosterList"></div>
+    </div>
+
+    <!-- 界面 4：特种行动 (默认隐藏) -->
+    <div class="sf-roster-screen" id="sfMissionScreen" style="display: none;">
+        <div class="sf-mission-list" id="sfMissionList">
+            <!-- 任务列表由 JS 渲染 -->
         </div>
     </div>
 </div>

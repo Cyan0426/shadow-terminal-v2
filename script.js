@@ -10801,12 +10801,11 @@ window.switchSFTab = function(tabName, element) {
     }
 };
 
-// 渲染干员名册
-function renderSFRoster() {
+// 渲染干员名册（加入升级按钮和战力计算）
+window.renderSFRoster = function() {
     const listEl = document.getElementById('sfRosterList');
     if (!listEl) return;
     
-    // 重新从本地读取最新数据
     sfRoster = JSON.parse(localStorage.getItem('sf_roster')) || [];
     
     if (sfRoster.length === 0) {
@@ -10814,40 +10813,188 @@ function renderSFRoster() {
         return;
     }
 
-    // 按照 稀有度 排序 (SSR -> SR -> R)
     const rankWeight = { 'SSR': 3, 'SR': 2, 'R': 1 };
     sfRoster.sort((a, b) => rankWeight[b.rank] - rankWeight[a.rank]);
 
     listEl.innerHTML = '';
-    sfRoster.forEach((agent, index) => {
+    sfRoster.forEach((agent) => {
         const card = document.createElement('div');
         card.className = `sf-card ${agent.rank}`;
         
-        // 以后这里可以点击查看详情，现在我们先把数据展示出来
+        // 计算当前战力 (四维总和)
+        const power = agent.fire + agent.stealth + agent.survive + agent.tactic;
+        // 计算升级花费 (基础5万 + 等级 * 2万)
+        const upCost = 50000 + (agent.level - 1) * 20000;
+        const isMax = agent.level >= agent.maxLv;
+
         card.innerHTML = `
             <div class="sf-card-header">
                 <div class="sf-card-name">${agent.name}</div>
                 <div class="sf-card-rank">${agent.rank}</div>
             </div>
-            <div class="sf-card-stats">
-                等级: <span>Lv.${agent.level}</span><br>
+            <div class="sf-card-stats" style="margin-bottom: 5px;">
+                战力: <span style="color: var(--gold); font-weight: bold;">${power}</span><br>
+                等级: <span>Lv.${agent.level} / ${agent.maxLv}</span><br>
                 火力: <span>${agent.fire}</span> | 隐蔽: <span>${agent.stealth}</span><br>
                 生存: <span>${agent.survive}</span> | 战术: <span>${agent.tactic}</span>
             </div>
+            <button class="sf-upgrade-btn" 
+                onclick="upgradeSFAgent('${agent.uid}')"
+                ${isMax ? 'disabled' : ''}>
+                ${isMax ? '已满级' : `升级 ($${upCost.toLocaleString()})`}
+            </button>
         `;
         listEl.appendChild(card);
     });
-}
+};
 
-// 修改一下之前的 closeSFResult 函数，让它回到招募中心，并清理状态
+// 升级干员逻辑
+window.upgradeSFAgent = function(uid) {
+    let agent = sfRoster.find(a => a.uid == uid);
+    if (!agent) return;
+    if (agent.level >= agent.maxLv) return alert('干员已达到等级上限！');
+
+    const cost = 50000 + (agent.level - 1) * 20000;
+    if (dispatchFunds < cost) {
+        return alert(`资金不足！升级需要 $${cost.toLocaleString()}。请去玩小游戏赚钱。`);
+    }
+
+    // 扣除资金
+    dispatchFunds -= cost;
+    if (typeof renderDispatchFunds === 'function') renderDispatchFunds();
+    if (typeof saveGameState === 'function') saveGameState();
+
+    // 提升等级和属性
+    agent.level++;
+    agent.fire += 2;
+    agent.stealth += 2;
+    agent.survive += 2;
+    agent.tactic += 2;
+
+    // 保存并刷新
+    localStorage.setItem('sf_roster', JSON.stringify(sfRoster));
+    renderSFRoster();
+    updateSFUI();
+    if (typeof triggerGravesAltMessage === 'function') {
+        triggerGravesAltMessage(`${agent.name} 升级成功，现在等级是 Lv.${agent.level}。这钱花得值。`);
+    }
+};
+
+// 渲染特种行动任务
+const SF_MISSIONS = [
+    { id: 'm1', name: '高价值目标斩首', desc: '深入敌后，清除携带生化武器的敌方指挥官。', reqPower: 60, reward: 1500000 },
+    { id: 'm2', name: '机密数据回收', desc: '潜入戒备森严的研究所，拷贝核心数据并炸毁服务器。', reqPower: 120, reward: 3000000 },
+    { id: 'm3', name: '武装押运护航', desc: '保护暗影公司的冷链运输车队穿过交战区。', reqPower: 250, reward: 8000000 },
+    { id: 'm4', name: '摧毁敌方防空阵地', desc: '呼叫空袭前，必须手动瘫痪敌方的雷达与防空导弹。', reqPower: 400, reward: 15000000 }
+];
+
+window.renderSFMissions = function() {
+    const listEl = document.getElementById('sfMissionList');
+    if (!listEl) return;
+    
+    sfRoster = JSON.parse(localStorage.getItem('sf_roster')) || [];
+    if (sfRoster.length === 0) {
+        listEl.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 30px;">没有干员可以执行任务，请先去招募。</div>';
+        return;
+    }
+
+    // 生成干员下拉选项
+    let agentOptions = sfRoster.map(a => `<option value="${a.uid}">${a.name} (Lv.${a.level} - 战力: ${a.fire+a.stealth+a.survive+a.tactic})</option>`).join('');
+
+    listEl.innerHTML = '';
+    SF_MISSIONS.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'sf-mission-card';
+        card.innerHTML = `
+            <div class="sf-mission-title">🚨 ${m.name}</div>
+            <div class="sf-mission-desc">${m.desc}</div>
+            <div class="sf-mission-req">建议战力: ${m.reqPower} | 基础报酬: $${m.reward.toLocaleString()}</div>
+            <select class="sf-select-agent" id="select_${m.id}">
+                <option value="">-- 选择执行干员 --</option>
+                ${agentOptions}
+            </select>
+            <button class="sf-btn-primary" style="width: 100%; padding: 10px; font-size: 13px;" onclick="executeSFMission('${m.id}')">派遣行动</button>
+        `;
+        listEl.appendChild(card);
+    });
+};
+
+// 执行任务逻辑
+window.executeSFMission = function(missionId) {
+    const mission = SF_MISSIONS.find(m => m.id === missionId);
+    const select = document.getElementById(`select_${missionId}`);
+    const uid = select.value;
+
+    if (!uid) return alert('请先选择执行任务的干员！');
+
+    const agent = sfRoster.find(a => a.uid == uid);
+    const power = agent.fire + agent.stealth + agent.survive + agent.tactic;
+
+    // 成功率计算：战力越高，成功率越高 (保底10%，最高95%)
+    let successRate = 0.5 + (power - mission.reqPower) * 0.005;
+    successRate = Math.max(0.1, Math.min(0.95, successRate));
+
+    // 模拟动画
+    select.disabled = true;
+    if (typeof addCommLogWithTyping === 'function') {
+        addCommLogWithTyping(`[系统] 特种干员 ${agent.name} 已出发执行《${mission.name}》...`, 'normal');
+    }
+
+    setTimeout(() => {
+        if (Math.random() < successRate) {
+            // 成功
+            dispatchFunds += mission.reward;
+            if (typeof renderDispatchFunds === 'function') renderDispatchFunds();
+            if (typeof saveGameState === 'function') saveGameState();
+            alert(`【行动成功】\\n干员 ${agent.name} 完美完成任务！\\n\\n获得行动资金: $${mission.reward.toLocaleString()}`);
+            if (typeof addCommLogWithTyping === 'function') addCommLogWithTyping(`[捷报] ${agent.name} 成功完成《${mission.name}》，资金已入账。`, 'success');
+        } else {
+            // 失败（惩罚：掉级或扣钱，这里选择干员负伤掉经验，简单点就扣点钱）
+            const loss = Math.floor(mission.reward * 0.2);
+            dispatchFunds = Math.max(0, dispatchFunds - loss);
+            if (typeof renderDispatchFunds === 'function') renderDispatchFunds();
+            if (typeof saveGameState === 'function') saveGameState();
+            alert(`【行动失败】\\n干员 ${agent.name} 遭遇猛烈抵抗，被迫撤退。\\n\\n损失医药费及违约金: $${loss.toLocaleString()}`);
+            if (typeof addCommLogWithTyping === 'function') addCommLogWithTyping(`[警报] ${agent.name} 在《${mission.name}》中失利，已紧急撤离。`, 'alert');
+        }
+        renderSFMissions(); // 刷新界面
+    }, 1500);
+};
+
+// 修改 Tab 切换（加上 mission 界面）
+window.switchSFTab = function(tabName, element) {
+    document.querySelectorAll('.sf-tab').forEach(t => t.classList.remove('active'));
+    if(element) element.classList.add('active');
+
+    const screens = ['sfGachaScreen', 'sfResultScreen', 'sfRosterScreen', 'sfMissionScreen'];
+    screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    if (tabName === 'gacha') {
+        document.getElementById('sfGachaScreen').style.display = 'flex';
+    } else if (tabName === 'roster') {
+        document.getElementById('sfRosterScreen').style.display = 'flex';
+        renderSFRoster();
+    } else if (tabName === 'mission') {
+        document.getElementById('sfMissionScreen').style.display = 'flex';
+        renderSFMissions();
+    }
+};
+
+// 这个是被你删掉的，我现在补回来，完美闭合抽卡逻辑
 window.closeSFResult = function() {
-    document.getElementById('sfResultScreen').style.display = 'none';
-    document.getElementById('sfGachaScreen').style.display = 'flex';
-    // 保证 Tab 高亮正确
+    const resScreen = document.getElementById('sfResultScreen');
+    const gachaScreen = document.getElementById('sfGachaScreen');
+    if (resScreen) resScreen.style.display = 'none';
+    if (gachaScreen) gachaScreen.style.display = 'flex';
+    
     const tabs = document.querySelectorAll('.sf-tab');
     if (tabs.length > 0) {
         tabs[0].classList.add('active');
         tabs[1].classList.remove('active');
+        tabs[2].classList.remove('active');
     }
     updateSFUI();
 };

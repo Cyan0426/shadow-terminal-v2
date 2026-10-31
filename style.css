@@ -4688,3 +4688,28 @@ body .phone-mockup .header-name {
 }
 /* 名册界面 */
 .sf-roster-screen { flex: 1; display: flex; flex-direction: column; }
+/* 升级按钮 */
+.sf-upgrade-btn {
+    background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-dark);
+    color: var(--gold); padding: 6px; border-radius: 4px; margin-top: 8px;
+    font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: inherit; width: 100%;
+}
+.sf-upgrade-btn:hover { background: var(--gold-gradient); color: var(--bg-dark); }
+.sf-upgrade-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #1a1a22; color: var(--text-muted); border-color: #2a2a35; }
+
+/* 特种行动任务列表 */
+.sf-mission-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; scrollbar-width: none; }
+.sf-mission-list::-webkit-scrollbar { display: none; }
+.sf-mission-card {
+    background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 12px;
+}
+.sf-mission-title { font-size: 14px; font-weight: bold; color: #e03e3e; margin-bottom: 5px; }
+.sf-mission-desc { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.4; }
+.sf-mission-req { font-size: 11px; color: var(--gold); margin-bottom: 10px; }
+
+/* 选择干员下拉框 */
+.sf-select-agent {
+    width: 100%; background: #121216; border: 1px solid var(--gold-dark);
+    color: var(--text-primary); padding: 8px; border-radius: 4px;
+    margin-bottom: 8px; outline: none; font-family: inherit;
+}
