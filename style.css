@@ -4687,7 +4687,14 @@ body .phone-mockup .header-name {
     color: var(--gold); border-bottom-color: var(--gold); font-weight: bold;
 }
 /* 名册界面 */
-.sf-roster-screen { flex: 1; display: flex; flex-direction: column; }
+/* 名册与任务通用界面 */
+.sf-roster-screen { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 0; /* 👈 核心修复1：防止内容撑破父级布局 */
+    overflow: hidden; /* 👈 核心修复2：保证滑动只在内部进行 */
+}
 /* 升级按钮 */
 .sf-upgrade-btn {
     background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-dark);
@@ -4698,7 +4705,16 @@ body .phone-mockup .header-name {
 .sf-upgrade-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #1a1a22; color: var(--text-muted); border-color: #2a2a35; }
 
 /* 特种行动任务列表 */
-.sf-mission-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; scrollbar-width: none; }
+.sf-mission-list { 
+    flex: 1; 
+    overflow-y: auto; /* 开启垂直滚动 */
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    padding-right: 5px; 
+    padding-bottom: 20px; /* 底部留点白，别贴死 */
+    scrollbar-width: none; 
+}
 .sf-mission-list::-webkit-scrollbar { display: none; }
 .sf-mission-card {
     background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 12px;
