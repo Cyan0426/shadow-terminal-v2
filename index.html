@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#060608">
+    <title>暗影终端 · Shadow Terminal</title>
+
+  <link rel="stylesheet" href="style.css">
+  </head>
+<body>
+<div class="phone-mockup">
+    
+    <!-- 安全验证 -->
+    <div class="security-overlay" id="securityOverlay">
+        <div class="security-warning" id="securityWarning">检测到高危操作 · 强制复核</div>
+        <div class="security-scan-box">
+            <div class="face-icon" style="font-size:60px; color:var(--gold);">👤</div>
+        </div>
+        <div class="security-msg" id="securityMsg">正在验证访客身份...</div>
+        <div class="security-sub" id="securitySub">请保持面部在框内，等待系统识别</div>
+        <button class="security-btn" id="securityBtn" onclick="confirmSecurityPass()">已确认 · 进入</button>
+    </div>
+
+    <!-- 登录 -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-step" id="stepName">
+            <div class="login-logo">G</div>
+            <div class="login-title">SHADOW TERMINAL</div>
+            <div class="login-subtitle">暗影终端 · USER LOGIN</div>
+            <div class="login-input-group">
+                <label>YOUR ID · 访客代号</label>
+                <input type="text" id="usernameInput" placeholder="输入你的名字" autocomplete="off">
+            </div>
+            <button class="login-btn" onclick="goToFaceScan()">识别身份</button>
+        </div>
+        <div class="face-step" id="stepFace">
+            <div class="face-scan-box"><div class="face-icon">👤</div></div>
+            <div class="verifying-text">VERIFYING</div>
+            <div class="verifying-sub">正在验证执行总裁身份</div>
+        </div>
+        <div class="pass-step" id="stepPass">
+            <div class="pass-title">请输入访问密码</div>
+            <div class="pass-subtitle">仅限执行总裁本人授权访问</div>
+            <div class="pass-dots" id="passDots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="num-pad" id="numPad">
+                <div class="num-btn" onclick="inputPass('1')">1</div>
+                <div class="num-btn" onclick="inputPass('2')">2</div>
+                <div class="num-btn" onclick="inputPass('3')">3</div>
+                <div class="num-btn" onclick="inputPass('4')">4</div>
+                <div class="num-btn" onclick="inputPass('5')">5</div>
+                <div class="num-btn" onclick="inputPass('6')">6</div>
+                <div class="num-btn" onclick="inputPass('7')">7</div>
+                <div class="num-btn" onclick="inputPass('8')">8</div>
+                <div class="num-btn" onclick="inputPass('9')">9</div>
+                <div class="num-btn clear" onclick="clearPass()">清除</div>
+                <div class="num-btn zero" onclick="inputPass('0')">0</div>
+                <div class="num-btn clear" onclick="submitPass()">确认</div>
+            </div>
+        </div>
+        <div class="error-popup" id="errorPopup">
+            <div class="err-title">验证失败</div>
+            <div class="err-msg">"Darlin'，你忘记我的生日了吗？"</div>
+        </div>
+    </div>
+
+    <!-- 主应用 -->
+    <div class="main-app" id="mainApp">
+        <div class="system-toast" id="systemToast">
+            <div class="toast-icon">🔒</div>
+            <div class="toast-content">
+                <div class="toast-title">未知号码 · SHADOW_06</div>
+                <div class="toast-msg" id="toastMsg">Darlin'，我看到你登入我的终端了。别声张，用这个小号和我说话。</div>
+            </div>
+        </div>
+      <div class="status-bar">
+    <span id="currentTime">15:06</span>
+    <span id="currentStatus" style="color: var(--text-muted); font-size: 11px; letter-spacing: 1px;">加载中...</span>
+</div>
+
+        <div class="content-area">
+            <!-- 终端页面 -->
+            <div class="page active" id="page-assets">
+                <div class="app-header">
+                    <div class="header-profile">
+                        <div class="header-big-g">G</div>
+                        <div class="header-info">
+                            <div class="header-name">菲利普·格瑞夫斯</div>
+                            <div class="header-role">暗影公司 CEO</div>
+                            <div class="header-id">SC-EP-0923</div>
+                            <div class="header-perm">最高权限 · 全权处置 · 无需二级审批</div>
+                        </div>
+                    </div>
+                    <div class="exit-btn" onclick="handleLogout()">× 注销</div>
+                    <div class="header-subtitle">SHADOW COMPANY · EST. TEXAS · EXECUTIVE PRESIDENT PRIVATE TERMINAL</div>
+                </div>
+
+                <div class="asset-overview">
+                    <div class="label">TOTAL ASSETS · 总资产（实时）</div>
+                    <div class="total-amount" id="totalAssets">$ 40,156,840,297</div>
+                    <div class="label">AVAILABLE · 点击可展开明细</div>
+                    <div class="chart-container">
+                        <div style="font-size: 9px; color: var(--text-muted); position: absolute; top: -12px; left: 10px; letter-spacing: 1px;">📈 实时股市行情</div>
+                        <canvas id="assetChart"></canvas>
+                        <div class="chart-tag" id="chartTag">涨停 · LIMIT UP</div>
+                    </div>
+                    <div class="currency-list" id="currencyList">
+                        <div class="currency-item"><span class="name">美元 USD (70%)</span><span class="value" data-base="28109788207">$ 28,109,788,207</span></div>
+                        <div class="currency-item"><span class="name">欧元 EUR (12%)</span><span class="value" data-base="4818820835">$ 4,818,820,835</span></div>
+                        <div class="currency-item"><span class="name">瑞士法郎 CHF (8%)</span><span class="value" data-base="3212547223">$ 3,212,547,223</span></div>
+                        <div class="currency-item"><span class="name">港币 HKD (5%)</span><span class="value" data-base="2007842015">$ 2,007,842,015</span></div>
+                        <div class="currency-item"><span class="name">离岸人民币 CNH (3%)</span><span class="value" data-base="1204705209">$ 1,204,705,209</span></div>
+                        <div class="currency-item"><span class="name">日元/加密资产 (2%)</span><span class="value" data-base="803136808">$ 803,136,808</span></div>
+                    </div>
+                    <div class="bank-entry" onclick="openBank()">
+                        <div class="text">💳 私人银行账户 · 可用余额 <span id="entryBalance">$ 120.4 亿</span></div>
+                        <div class="icon">→</div>
+                    </div>
+                </div>
+                <!-- 后面接股权与市场代码... -->
+                <!-- 股权与控股 -->
+                <div class="holdings-section">
+                    <div class="section-title">🏛️ 股权与控股 · EQUITY & HOLDINGS</div>
+                    <div class="holdings-item"><div><div class="name">📈 暗影公司 执行总裁持股</div><div class="sub">持股 51.3% · 绝对控制权</div></div><div class="value" data-base="20584109376">$ 20,584,109,376</div></div>
+                    <div class="holdings-item"><div><div class="name">🔬 暗影防务研究院 全资</div><div class="sub">无人机蜂群 / 单兵外骨骼</div></div><div class="value" data-base="3600078221">$ 3,600,078,221</div></div>
+                    <div class="holdings-item"><div><div class="name">🚚 黑曜石物流 控股</div><div class="sub">持股 78% · 灰色运输线</div></div><div class="value" data-base="1240027146">$ 1,240,027,146</div></div>
+                    <div class="holdings-item"><div><div class="name">⛏️ 阿特拉斯资源 参股</div><div class="sub">持股 22% · 稀土 / 锂矿</div></div><div class="value" data-base="860142007">$ 860,142,007</div></div>
+                </div>
+
+                <!-- 流动与金融 -->
+                <div class="holdings-section">
+                    <div class="section-title">💰 流动与金融 · LIQUID & FINANCIAL</div>
+                    <div class="holdings-item"><div><div class="name">💵 现金及等价物</div><div class="sub">多币种活期 · 随时可动用</div></div><div class="value" data-base="96402165">$ 96,402,165</div></div>
+                    <div class="holdings-item"><div><div class="name">🏦 债券与固收组合</div><div class="sub">久期2.7年 · 账面浮亏$1.6亿</div></div><div class="value" data-base="1860045472">$ 1,860,045,472</div></div>
+                    <div class="holdings-item"><div><div class="name">📊 私募与对冲基金</div><div class="sub">量化 / 宏观 / 军工策略</div></div><div class="value" data-base="2340055768">$ 2,340,055,768</div></div>
+                    <div class="holdings-item"><div><div class="name">🪙 加密货币冷钱包</div><div class="sub">BTC/ETH/USDT · 12个硬件钱包</div></div><div class="value" data-base="1250840291">$ 1,250,840,291</div></div>
+                </div>
+
+                <!-- 不动产与重工 -->
+                <div class="holdings-section">
+                    <div class="section-title">🏭 不动产与重工 · REAL ESTATE & HEAVY ASSETS</div>
+                    <div class="holdings-item"><div><div class="name">🏠 德克萨斯·暗影地下总部</div><div class="sub">自持 · 未公开 · 含机场与掩体</div></div><div class="value" data-base="5200122334">$ 5,200,122,334</div></div>
+                    <div class="holdings-item"><div><div class="name">🏝️ 加勒比私人岛屿·安全屋</div><div class="sub">自住 · 防御系统 · 战术靶场</div></div><div class="value" data-base="380040215">$ 380,040,215</div></div>
+                    <div class="holdings-item"><div><div class="name">🌍 全球前沿基地（6处）</div><div class="sub">缅甸/哥伦比亚/乌克兰等</div></div><div class="value" data-base="1800000000">$ 1,800,000,000</div></div>
+                    <div class="holdings-item"><div><div class="name">✈️ 重装资产信托</div><div class="sub">AC-130/直升机/装甲车/卫星</div></div><div class="value" data-base="1000000000">$ 1,000,000,000</div></div>
+                </div>
+
+                <!-- 常备武力 -->
+                <div class="holdings-section">
+                    <div class="section-title">🔫 常备武力 · CORE FORCE</div>
+                    <div class="holdings-item"><div><div class="name">🛡️ 全球签约雇佣兵</div><div class="sub">1.8万人 · 核心骨干2000人</div></div><div class="value" data-base="4500000000">$ 4,500,000,000</div></div>
+                    <div class="holdings-item"><div><div class="name">🎯 战术训练营与装备库</div><div class="sub">全球6个基地 · 单兵武器库</div></div><div class="value" data-base="330000000">$ 330,000,000</div></div>
+                </div>
+
+                <!-- 市场行情 -->
+                <div class="market-section">
+                    <div class="section-title">📊 全球市场行情 · MARKET OVERVIEW</div>
+                    <div class="market-card"><div class="market-info"><div class="name">📊 道琼斯工业指数</div><div class="symbol">DJI</div></div><div class="market-data"><div class="price" data-base="50906.05">50,906.05</div><div class="change text-down">▼ -443.87 (-0.86%)</div></div></div>
+                    <div class="market-card"><div class="market-info"><div class="name">📈 标普500指数</div><div class="symbol">SPX</div></div><div class="market-data"><div class="price" data-base="7651.54">7,651.54</div><div class="change text-down">▼ -19.30 (-0.25%)</div></div></div>
+                    <div class="market-card"><div class="market-info"><div class="name">📉 VIX恐慌指数</div><div class="symbol">VIX</div></div><div class="market-data"><div class="price" data-base="19.62">19.62</div><div class="change text-up">▲ +2.72</div></div></div>
+                    <div class="market-card"><div class="market-info"><div class="name">💵 10年期美债收益率</div><div class="symbol">固收组合久期 2.7年</div></div><div class="market-data"><div class="price" data-base="5.29">5.29%</div><div class="change text-down">▼ 账面浮亏 $1.6亿</div></div></div>
+                    <div class="market-card"><div class="market-info"><div class="name">🏆 现货黄金</div><div class="symbol">实物持仓 $9.8亿</div></div><div class="market-data"><div class="price" data-base="4125.39">$ 4,125.39</div><div class="change text-down">▼ -3.75% (7周低点)</div></div></div>
+                    <div class="market-card"><div class="market-info"><div class="name">🛢️ 布伦特原油</div><div class="symbol">中东局势溢价</div></div><div class="market-data"><div class="price" data-base="70.00">$ 70.00+</div><div class="change text-up">▲ +4%</div></div></div>
+                </div>
+            </div>
+
+            <!-- 通讯录 -->
+            <div class="page" id="page-contacts">
+                <div class="chat-list" id="contactsList">
+                    <div class="chat-item" onclick="openChat('partner', 'ANA · 伴侣')" style="border-color: var(--gold-dark);">
+                        <div class="chat-avatar" id="selfAvatar">A</div>
+                        <div class="chat-content">
+                            <div class="chat-header"><span class="chat-name" id="partnerName">ANA · 伴侣</span><span class="chat-time" style="color:var(--gold-dim)">专属频道</span></div>
+                            <div class="chat-message" style="color:var(--gold);">Darlin'，这台设备上的所有权限都对你开放。</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="openChat('oz', '奥兹 (Oz)')">
+                        <div class="chat-avatar">O</div>
+                        <div class="chat-content">
+                            <div class="chat-header"><span class="chat-name">奥兹 (Oz)</span><span class="chat-time">10分钟前</span></div>
+                            <div class="chat-message">老板，科威特那边的尾款到账了...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="openChat('farah', '法拉赫 (Farah)')">
+                        <div class="chat-avatar">F</div>
+                        <div class="chat-content">
+                            <div class="chat-header"><span class="chat-name">法拉赫 (Farah)</span><span class="chat-time">昨天 03:42</span></div>
+                            <div class="chat-message">格瑞夫斯。听说Konni在乌兹克斯坦边境有动作...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="openChat('unknown', '未知号码 (卡塔尔)')">
+                        <div class="chat-avatar">U</div>
+                        <div class="chat-content">
+                            <div class="chat-header"><span class="chat-name">未知号码 (卡塔尔)</span><span class="chat-time">昨天 18:30</span></div>
+                            <div class="chat-message">如果你们能在一个月内把两套防空系统送到苏丹港...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 朋友圈 -->
+            <div class="page" id="page-moments">
+                <div class="travel-entry" onclick="openTravel()">
+    <div class="album-icon">✈️</div>
+    <div class="album-text">
+        <div class="album-title">暗影旅行</div>
+        <div class="album-sub">6 座城市 · 18 张明信片待收集</div>
+    </div>
+    <div class="album-arrow">→</div>
+</div>
+                <div class="album-entry" onclick="openAlbum()">
+                    <div class="album-icon">📸</div>
+                    <div class="album-text">
+                        <div class="album-title">暗影相册 · 核心影像</div>
+                        <div class="album-sub">仅限特别访客查看（共24张）</div>
+                    </div>
+                    <div class="album-arrow">→</div>
+                </div>
+
+
+
+
+<div class="briefing-entry" onclick="openBriefing()">
+    <div class="album-icon">📋</div>
+    <div class="album-text">
+        <div class="album-title">暗影今日简报</div>
+    </div>
+    <div class="album-arrow">→</div>
+</div>
+
+                <div class="moments-card">
+                    <div class="moments-header"><div class="chat-avatar" style="color:var(--gold); margin-right:10px;">G</div><div class="name">菲利普·格瑞夫斯 (P. Graves)</div><div class="tag">暗影CEO</div></div>
+                    <div class="moments-content">Some cargo stays off the manifest. Some people come home with me. @<span class="visitor-name">伴侣</span> <br><span style="font-size:11px; color:var(--text-muted);">(有些货上不了清单。有些人，老子亲自去接。)</span></div>
+                    <div class="moments-image">[ 夜景 · 停机坪与C-17运输机尾翼 ]</div>
+                    <div class="moments-footer"><span>👍 47 人点赞</span><span>💬 9 条评论</span></div>
+                    <div class="moments-comments">
+                        <div class="comment-item"><span class="c-name">奥兹：</span><span class="c-reply">Copy that, boss. GPS modules physically destroyed. (收到，老板。GPS已物理销毁。)</span></div>
+                        <div class="comment-item"><span class="c-name">法拉赫：</span><span class="c-reply">"Humanitarian aid" again? You don't believe that, Graves. (又是“人道主义物资”？你自己信吗。)</span></div>
+                       <div class="comment-item"><span class="c-name"><span class="visitor-name">你</span>：</span><span class="c-reply">停机坪的灯光很漂亮，像夜里的星星。</span></div>
+                       <div class="comment-item"><span class="c-name">P. Graves 回复 <span class="visitor-name">你</span>：</span><span class="c-reply">Darlin', stars don't fall and kill people. This cargo does. (星星不会掉下来砸死人，但这批货会。)</span></div>
+                    </div>
+                </div>
+                <div class="moments-card">
+                    <div class="moments-header"><div class="chat-avatar" style="color:var(--gold-dim); margin-right:10px;">O</div><div class="name">奥兹 (Oz)</div><div class="tag">暗影公司</div></div>
+                    <div class="moments-content">72 hours no sleep. Boss is off the grid with his girl while I'm dealing with a $1.5B shipment. Living the dream. ☕️ <br><span style="font-size:11px; color:var(--text-muted);">(72小时没合眼。老板跟他的女人消失了，留我处理15亿的货。真是美好生活。)</span></div>
+                    <div class="moments-image">[ 办公桌上堆满文件与一杯黑咖啡 ]</div>
+                    <div class="moments-footer"><span>👍 32 人点赞</span><span>💬 4 条评论</span></div>
+                    <div class="moments-comments">
+                        <div class="comment-item"><span class="c-name">未知买家：</span><span class="c-reply">When is the Sudan shipment leaving? (苏丹港那批货什么时候能发？)</span></div>
+                        <div class="comment-item"><span class="c-name">P. Graves：</span><span class="c-reply">Good work, Oz. I'll make it up to you. (干得好，Oz。我会补偿你的。)</span></div>
+                    </div>
+                </div>
+                <div class="moments-card">
+                    <div class="moments-header"><div class="chat-avatar" style="color:var(--text-primary); margin-right:10px;">F</div><div class="name">法拉赫 (Farah)</div><div class="tag">乌兹克斯坦解放军</div></div>
+                    <div class="moments-content">Some people put on a suit and forget who they fought for. The border doesn't need businessmen. <br><span style="font-size:11px; color:var(--text-muted);">(有些人穿上了西装，就忘了曾经为谁而战。乌兹克斯坦的边境不需要商人。)</span></div>
+                    <div class="moments-image">[ 乌兹克斯坦山区阴云密布的天空 ]</div>
+                    <div class="moments-footer"><span>👍 89 人点赞</span><span>💬 12 条评论</span></div>
+                    <div class="moments-comments">
+                        <div class="comment-item"><span class="c-name">P. Graves：</span><span class="c-reply">I sell services. Pay up, and I'll fight for you too. (我只是提供服务的。付得起钱，我也帮你打仗。)</span></div>
+                        <div class="comment-item"><span class="c-name">法拉赫 回复 P. Graves：</span><span class="c-reply">Keep your business out of my country. (你最好别把生意做到我头上。)</span></div>
+                    </div>
+                </div>
+                <div class="moments-card">
+                    <div class="moments-header"><div class="chat-avatar" style="color:var(--gold-dim); margin-right:10px;">U</div><div class="name">未知号码 (卡塔尔)</div><div class="tag">潜在客户</div></div>
+                    <div class="moments-content">The weather in Doha is nice this time of year. Perfect for closing deals. 🌴💼 <br><span style="font-size:11px; color:var(--text-muted);">(多哈这个季节的天气不错，非常适合谈生意。)</span></div>
+                    <div class="moments-image">[ 豪华游艇甲板上的香槟与沙漠天际线 ]</div>
+                    <div class="moments-footer"><span>👍 15 人点赞</span><span>💬 2 条评论</span></div>
+                    <div class="moments-comments">
+                        <div class="comment-item"><span class="c-name">P. Graves：</span><span class="c-reply">I prefer Texas. Less sand in my boots. (我还是喜欢德州。靴子里少进点沙子。)</span></div>
+                    </div>
+                </div>
+                <div class="moments-card">
+                    <div class="moments-header"><div class="chat-avatar" style="color:var(--text-muted); margin-right:10px;">S</div><div class="name">暗影前线小队 · 队长</div><div class="tag">暗影公司</div></div>
+                    <div class="moments-content">02:00. Target area cleared. Waiting for extraction. No casualties. 💀 <br><span style="font-size:11px; color:var(--text-muted);">(02:00。任务区域清空。等待撤离。无伤亡。)</span></div>
+                    <div class="moments-image">[ 夜视仪视角下的昏暗走廊，绿色调 ]</div>
+                    <div class="moments-footer"><span>👍 56 人点赞</span><span>💬 8 条评论</span></div>
+                    <div class="moments-comments">
+                        <div class="comment-item"><span class="c-name">奥兹：</span><span class="c-reply">Good work. Report back at base. (干得好。回基地报到。)</span></div>
+                    </div>
+                </div>
+                <div class="moments-card">
+                    <div class="moments-header"><div class="chat-avatar" style="color:var(--text-muted); margin-right:10px;">R</div><div class="name">暗影防务研究院</div><div class="tag">研发部门</div></div>
+                    <div class="moments-content">Prototype 7 is ready for field testing. The payload is... significant. 🧪🔬 <br><span style="font-size:11px; color:var(--text-muted);">(原型7号已准备好进行实地测试。其有效载荷……非常可观。)</span></div>
+                    <div class="moments-image">[ 实验室冷光下，一个密封的战术级设备 ]</div>
+                    <div class="moments-footer"><span>👍 21 人点赞</span><span>💬 3 条评论</span></div>
+                    <div class="moments-comments">
+                        <div class="comment-item"><span class="c-name">P. Graves：</span><span class="c-reply">Don't blow up my base. (别把我的基地炸了。)</span></div>
+                    </div>
+                </div>
+            </div>
+ <!-- 作战中枢 -->
+<div class="page" id="page-combat">
+<!-- 战术训练快速入口 -->
+<div class="contract-board" style="margin-top: 16px; margin-bottom: 16px; border-color: var(--gold-dark);">
+    <div class="section-title">🎮 战术训练 · TACTICAL TRAINING</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px;">
+        <div class="app-icon-item" onclick="openRecruitGame()" style="background: rgba(92, 124, 250, 0.05); border: 1px solid var(--border-color); border-radius: 4px; padding: 14px 5px; cursor: pointer; transition: all 0.2s;">
+            <div class="app-icon" style="font-size: 26px; margin-bottom: 8px; color: var(--gold);">💼</div>
+            <div class="app-name" style="font-size: 11px; text-align: center; color: var(--text-primary);">入职试炼</div>
+        </div>
+        <div class="app-icon-item" onclick="initCardGame()" style="background: rgba(92, 124, 250, 0.05); border: 1px solid var(--border-color); border-radius: 4px; padding: 14px 5px; cursor: pointer; transition: all 0.2s;">
+            <div class="app-icon" style="font-size: 26px; margin-bottom: 8px; color: var(--gold);">🃏</div>
+            <div class="app-name" style="font-size: 11px; text-align: center; color: var(--text-primary);">抽鬼牌</div>
+        </div>
+        <div class="app-icon-item" onclick="openSnakeGame()" style="background: rgba(92, 124, 250, 0.05); border: 1px solid var(--border-color); border-radius: 4px; padding: 14px 5px; cursor: pointer; transition: all 0.2s;">
+            <div class="app-icon" style="font-size: 26px; margin-bottom: 8px; color: var(--gold);">🐍</div>
+            <div class="app-name" style="font-size: 11px; text-align: center; color: var(--text-primary);">数据吞噬</div>
+        </div>
+    </div>
+</div>
+    <div class="combat-map-container">
+        <div class="combat-map-title">GLOBAL THREAT MAP · 全球态势图</div>
+        <div class="map-bg">
+            <div class="base-dot texas" onclick="showBase('texas', this)" title="德克萨斯总部"></div>
+            <div class="base-dot caribbean" onclick="showBase('caribbean', this)" title="加勒比安全屋"></div>
+            <div class="base-dot ukraine" onclick="showBase('ukraine', this)" title="乌克兰前线基地"></div>
+            <div class="base-dot myanmar" onclick="showBase('myanmar', this)" title="缅甸训练营"></div>
+            <div class="base-dot middleeast" onclick="showBase('middleeast', this)" title="中东基地"></div>
+            <div class="base-dot europe" onclick="showBase('europe', this)" title="欧洲基地"></div>
+        </div>
+    </div>
+
+    <div class="base-info-panel" id="baseInfoPanel">
+        <div class="panel-title" id="baseName">德克萨斯总部</div>
+        <div class="panel-sub" id="baseCode">暗影中枢 · SHADOW HQ</div>
+        <div class="info-grid">
+            <div class="info-item"><span class="label">驻防武力</span><span class="val" id="baseForce">2,000 人</span></div>
+            <div class="info-item"><span class="label">火力配置</span><span class="val" id="baseWeapon">AC-130 × 4 / 装甲车 × 120</span></div>
+            <div class="info-item"><span class="label">季度预算</span><span class="val" id="baseBudget">$ 52 亿</span></div>
+            <div class="info-item"><span class="label">战备等级</span><span class="val text-up" id="baseStatus">DEFCON 2</span></div>
+        </div>
+    </div>
+
+
+
+ <div class="mission-board">
+        <div class="section-title">📋 当前执行任务 · OPERATIONS</div>
+        <div class="mission-list" id="missionList">
+            <!-- 任务动态渲染 -->
+        </div>
+    </div>
+<!-- 暗影业务池（接单区） -->
+<div class="contract-board">
+    <div class="section-title">💼 暗影业务池 · SHADOW CONTRACTS</div>
+    <div class="contract-scroll" id="contractScroll">
+        <!-- 订单卡片将由 JS 动态渲染 -->
+    </div>
+</div>
+<!-- 卫星与无人机监控 -->
+<div class="satellite-board">
+    <div class="section-title">🛰️ 全球卫星与无人机监控 · SATELLITE SURVEILLANCE</div>
+    <div class="radar-container">
+        <div class="radar-scope">
+            <div class="radar-sweep"></div>
+        </div>
+        <div class="radar-crosshair"></div>
+        <div class="radar-dot dot-1"></div>
+        <div class="radar-dot dot-2"></div>
+        <div class="radar-dot dot-3"></div>
+    </div>
+    <div class="surveillance-list" id="surveillanceList">
+        <!-- 监控目标动态渲染 -->
+    </div>
+</div>
+<div class="dispatch-entry" onclick="openDispatch()">
+    <div class="dispatch-entry-icon">🌍</div>
+    <div class="dispatch-entry-text">
+        <div class="dispatch-entry-title">全球特工派遣</div>
+        <div class="dispatch-entry-sub">部署暗影特工执行黑色行动</div>
+    </div>
+    <div class="dispatch-entry-arrow">→</div>
+</div>
+<!-- 黑箱行动入口 -->
+<div class="dispatch-entry" onclick="openBlackBox()" style="border-color: #e03e3e; background: rgba(224, 62, 62, 0.05); margin-top: 10px;">
+    <div class="dispatch-entry-icon" style="color: #e03e3e;">🎙️</div>
+    <div class="dispatch-entry-text">
+        <div class="dispatch-entry-title" style="color: #e03e3e;">黑箱行动 · 绝密档案</div>
+        <div class="dispatch-entry-sub">点击进入沉浸式文字推理，你的指挥将决定特工生死</div>
+    </div>
+    <div class="dispatch-entry-arrow" style="color: #e03e3e;">→</div>
+</div>
+<!-- 坎布雷亚事件入口（第四步新增） -->
+<div class="dispatch-entry" onclick="openRavenArchive()" style="border-color: #e03e3e; background: rgba(224, 62, 62, 0.05); margin-top: 10px;">
+    <div class="dispatch-entry-icon" style="color: #e03e3e;">📁</div>
+    <div class="dispatch-entry-text">
+        <div class="dispatch-entry-title" style="color: #e03e3e;">绝密卷宗 · 坎布雷亚</div>
+        <div class="dispatch-entry-sub">点击查阅格瑞夫斯退役前的内部档案与批注</div>
+    </div>
+    <div class="dispatch-entry-arrow" style="color: #e03e3e;">→</div>
+</div>
+
+</div>
+</div>
+<!-- 控制中心悬浮按钮（仅在登录后显示） -->
+
+<!-- ============ 暗影旅行 · HTML 结构 ============ -->
+
+
+
+<div class="memo-fab" onclick="openAppCenter()" style="position: absolute; bottom: 90px; right: 20px; z-index: 999;">📱</div>
+<!-- 入职面试主界面 -->
+<div class="recruit-overlay" id="recruitOverlay" style="display: none;">
+    <div class="recruit-header">
+        <div class="recruit-title">暗影入职试炼 · RECRUITMENT</div>
+        <div class="recruit-stats">
+            <div>信任值：<span id="recruitTrust" style="color:#2ecc71;">10</span></div>
+            <div>剩余步数：<span id="recruitSteps" style="color:var(--gold);">18</span></div>
+        </div>
+        <div class="recruit-close" onclick="closeRecruitGame()">✕</div>
+    </div>
+    <div class="recruit-map-container">
+        <div class="recruit-grid" id="recruitGrid"></div>
+    </div>
+    <div class="recruit-controls">
+        <button class="ctrl-btn" onclick="moveRecruitPlayer('up')">↑</button>
+        <div class="ctrl-row">
+            <button class="ctrl-btn" onclick="moveRecruitPlayer('left')">←</button>
+            <button class="ctrl-btn" onclick="moveRecruitPlayer('down')">↓</button>
+            <button class="ctrl-btn" onclick="moveRecruitPlayer('right')">→</button>
+        </div>
+    </div>
+</div>
+
+<!-- 入职面试对话弹窗 -->
+<div class="recruit-modal-overlay" id="recruitModal">
+    <div class="recruit-modal-card">
+        <div class="recruit-modal-title" id="recruitModalTitle">奥兹</div>
+        <div class="recruit-modal-text" id="recruitModalText">问题描述...</div>
+        <div class="recruit-modal-options" id="recruitModalOptions"></div>
+    </div>
+</div>
+
+<!-- 入职面试结算弹窗 -->
+<div class="recruit-result-modal" id="recruitResultModal">
+    <div class="recruit-result-card">
+        <div class="recruit-result-title" id="recruitResultTitle">入职成功</div>
+        <div class="recruit-result-desc" id="recruitResultDesc">评价...</div>
+        <div class="recruit-result-actions">
+            <button class="modal-btn" onclick="closeRecruitResult()">返回终端</button>
+        </div>
+    </div>
+</div>
+<!-- 绝密档案弹窗 -->
+<div class="shadow-db-overlay" id="shadowDbOverlay" style="display: none;">
+    <div class="db-header">
+        <div class="db-title">暗影核心数据库 · SHADOW CORE</div>
+        <div class="db-close" onclick="closeShadowDatabase()">✕</div>
+    </div>
+    <div class="db-tabs" id="dbTabs">
+        <div class="db-tab active" onclick="switchDbTab('A', this)">档案 A</div>
+        <div class="db-tab" onclick="switchDbTab('B', this)">档案 B</div>
+        <div class="db-tab" onclick="switchDbTab('C', this)">档案 C</div>
+    </div>
+    <div class="db-content-area" id="dbContentArea">
+        <div id="dbInputArea" class="db-input-area">
+            <input type="text" id="dbPasswordInput" placeholder="输入解密密码" autocomplete="off">
+            <button onclick="verifyDbPassword()">解密</button>
+        </div>
+        <div id="dbErrorMsg" class="db-error">权限被拒绝。请重新比对线索。</div>
+        <div class="db-document" id="dbDocument">
+            <div class="db-doc-title" id="dbDocTitle">行动报告</div>
+            <div class="db-doc-text" id="dbDocText"></div>
+            <div class="db-doc-quote" id="dbDocQuote"></div>
+            <div class="db-doc-signature" id="dbDocSignature"></div>
+        </div>
+    </div>
+</div>
+
+ <div class="bottom-nav">
+            <div class="nav-item" onclick="switchPage('page-assets', this)"><div class="icon">📊</div><span>终端</span></div>
+            <div class="nav-item active" onclick="switchPage('page-contacts', this)"><div class="icon">👥</div><span>通讯录</span></div>
+            <div class="nav-item" onclick="switchPage('page-moments', this)"><div class="icon">🌐</div><span>动态</span></div>
+           <div class="nav-item" onclick="switchPage('page-combat', this)"><div class="icon">🎯</div><span>作战</span></div>
+        </div>
+    </div>
+<!-- 备忘录底部抽屉 -->
+<div class="memo-drawer" id="memoDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">备忘录 · MEMO</div>
+        <div class="drawer-close" onclick="closeMemoDrawer()">✕</div>
+    </div>
+    <div class="memo-list" id="memoList">
+        <!-- 预设日程动态渲染 -->
+    </div>
+    <div class="memo-input-area">
+        <input type="text" id="memoInput" placeholder="添加新的备忘录..." onkeypress="handleMemoKeyPress(event)">
+        <button class="memo-add-btn" onclick="addMemo()">+</button>
+    </div>
+</div>
+
+<!-- 军火库抽屉（与备忘录平级，绝对不能套在一起） -->
+<div class="armory-drawer" id="armoryDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">军火库明细 · ARMORY</div>
+        <div class="drawer-close" onclick="closeArmory()">✕</div>
+    </div>
+    <button class="blindbox-btn" onclick="drawBlindbox()">查看今日推荐配备</button>
+<div class="armory-list" id="armoryList">
+    <!-- 武器动态渲染 -->
+</div>
+</div>
+
+
+
+<div class="blackbox-overlay" id="blackboxOverlay">
+    <div class="blackbox-header">
+        <div class="blackbox-title">黑箱行动 · BLACK BOX</div>
+        <div class="blackbox-close" onclick="closeBlackBox()">✕</div>
+    </div>
+    <div class="blackbox-stats" id="blackboxStats">
+        <div>特工：<span id="bbAgentName">猎鹰</span></div>
+        <div>生命：<span id="bbHealth" style="color: #2ecc71;">正常</span></div>
+        <div>进度：<span id="bbProgress">0%</span></div>
+    </div>
+    <div class="blackbox-log" id="blackboxLog"></div>
+    <div class="blackbox-choices" id="blackboxChoices"></div>
+</div>
+
+
+
+<!-- 人事档案绝密提示 -->
+<div class="personnel-modal" id="personnelModal">
+    <div class="modal-content" style="border-color: #e03e3e; max-width: 320px;">
+        <div class="modal-title" style="color: #e03e3e;">⛔ 访问拒绝 · ACCESS DENIED</div>
+        <div class="modal-msg">该模块已锁定。暗影公司核心人员档案为绝密层级，当前移动终端不具备解密权限。</div>
+        <div class="modal-msg" style="color: var(--gold-dim); font-size: 11px; margin-top: 10px;">请前往德克萨斯地下总部，连接加密终端进行身份复核。</div>
+        <div class="modal-btn-group" style="justify-content: center; margin-top: 15px;">
+            <button class="modal-btn cancel" onclick="closePersonnelModal()">确认</button>
+        </div>
+    </div>
+</div>
+
+<!-- 军火盲盒弹窗 -->
+<div class="blindbox-overlay" id="blindboxOverlay">
+    <div class="blindbox-card" id="blindboxCard">
+        <div class="blindbox-title">🎲 军火库盲盒</div>
+        <div class="blindbox-result" id="blindboxResult">
+            <!-- 抽取结果动态渲染 -->
+        </div>
+        <button class="modal-btn cancel" onclick="closeBlindbox()" style="margin-top: 15px;">确认</button>
+    </div>
+</div>
+<!-- 战术推演（2048） -->
+<div class="tactical-overlay" id="tacticalOverlay">
+    <div class="tactical-header">
+        <div class="tactical-score">算力值：<span id="tacticalScore">0</span></div>
+        <div class="tactical-btn-group">
+            <button class="tactical-undo-btn" onclick="undoTacticalMove()">撤销上一步</button>
+            <button class="tactical-close-btn" onclick="closeTacticalGame()">✕ 退出</button>
+        </div>
+    </div>
+    <div class="tactical-board" id="tacticalBoard">
+        <!-- 格子由 JS 动态渲染 -->
+    </div>
+<!-- 移动端手动控制按钮 -->
+<div class="tactical-controls">
+    <button class="ctrl-btn" onclick="moveTactical('up')">↑</button>
+    <div class="ctrl-row">
+        <button class="ctrl-btn" onclick="moveTactical('left')">←</button>
+        <button class="ctrl-btn" onclick="moveTactical('down')">↓</button>
+        <button class="ctrl-btn" onclick="moveTactical('right')">→</button>
+    </div>
+</div>
+    <!-- 结算弹窗 -->
+    <div class="tactical-result-overlay" id="tacticalResultOverlay">
+        <div class="tactical-result-card">
+            <div class="result-title" id="resultTitle">推演结束</div>
+            <div class="result-desc" id="resultDesc">策略已归档。</div>
+            <div class="result-actions">
+    <button class="modal-btn" id="continueBtn" onclick="continueTacticalGame()" style="display: none;">继续推演</button>
+    <button class="modal-btn" onclick="resetTacticalGame()">重新推演</button>
+    <button class="modal-btn cancel" onclick="closeTacticalGame()">退出</button>
+</div>
+        </div>
+    </div>
+</div>
+<!-- 暗影操盘（炒股小游戏） -->
+<div class="trading-overlay" id="tradingOverlay">
+    <div class="trading-header">
+        <div class="trading-title">暗影操盘 · SHADOW TRADING</div>
+        <div class="trading-close-btn" onclick="closeTradingGame()">✕</div>
+    </div>
+    
+    <div class="trading-stats">
+        <div class="stat-item">现金：<span id="tradingCash">$10,000,000</span></div>
+        <div class="stat-item">持仓市值：<span id="tradingHoldings">$0</span></div>
+        <div class="stat-item">总资产：<span id="tradingTotal">$10,000,000</span></div>
+        <div class="stat-item">第 <span id="tradingDay">1</span> 交易日</div>
+    </div>
+
+    <!-- 交易标的列表 -->
+    <div class="trading-asset-list" id="tradingAssetList">
+        <!-- 动态渲染 -->
+    </div>
+
+    <!-- 操盘日志 -->
+    <div class="trading-log-box">
+        <div class="log-title">操盘日志 · MARKET LOG</div>
+        <div class="trading-log" id="tradingLog">等待交易指令...</div>
+    </div>
+
+    <!-- 按钮 -->
+    <button class="trading-action-btn" onclick="nextTradingDay()">进入下一交易日</button>
+</div>
+
+<!-- 操盘结算弹窗 -->
+<div class="trading-modal-overlay" id="tradingModalOverlay">
+    <div class="trading-modal-card">
+        <div class="trading-modal-title" id="tradingResultTitle">清算警告</div>
+        <div class="trading-modal-desc" id="tradingResultDesc">资产已归零。</div>
+        <div class="trading-modal-actions">
+            <button class="modal-btn" onclick="resetTradingGame()">重新开始</button>
+            <button class="modal-btn cancel" onclick="closeTradingGame()">退出系统</button>
+        </div>
+    </div>
+</div>
+<!-- 计算器 -->
+<div class="calc-overlay" id="calcOverlay">
+    <div class="calc-header">
+        <div class="calc-title">暗影计算器 · CALCULATOR</div>
+        <div class="calc-close-btn" onclick="closeCalculator()">✕</div>
+    </div>
+    <!-- 显示屏 -->
+    <div class="calc-display" id="calcDisplay">0</div>
+    
+    <!-- 键盘区域 -->
+    <div class="calc-grid">
+        <button class="calc-btn func" onclick="calcClear()">C</button>
+        <button class="calc-btn func" onclick="calcInput('×')">×</button>
+        <button class="calc-btn func" onclick="calcInput('÷')">÷</button>
+        <button class="calc-btn func" onclick="calcBackspace()">⌫</button>
+
+        <button class="calc-btn num" onclick="calcInput('7')">7</button>
+        <button class="calc-btn num" onclick="calcInput('8')">8</button>
+        <button class="calc-btn num" onclick="calcInput('9')">9</button>
+        <button class="calc-btn op" onclick="calcInput('-')">-</button>
+
+        <button class="calc-btn num" onclick="calcInput('4')">4</button>
+        <button class="calc-btn num" onclick="calcInput('5')">5</button>
+        <button class="calc-btn num" onclick="calcInput('6')">6</button>
+        <button class="calc-btn op" onclick="calcInput('+')">+</button>
+
+        <button class="calc-btn num" onclick="calcInput('1')">1</button>
+        <button class="calc-btn num" onclick="calcInput('2')">2</button>
+        <button class="calc-btn num" onclick="calcInput('3')">3</button>
+        <button class="calc-btn op" onclick="calcPercent()">%</button>
+
+        <button class="calc-btn func" onclick="calcToggleSign()">+/-</button>
+        <button class="calc-btn num" onclick="calcInput('0')">0</button>
+        <button class="calc-btn num" onclick="calcInput('.')">.</button>
+        <button class="calc-btn equal" onclick="calcCalculate()">=</button>
+    </div>
+</div>
+
+<!-- 暗影日历 -->
+<div class="calendar-overlay" id="calendarOverlay">
+    <div class="calendar-header">
+        <div class="calendar-title">暗影日历 · CALENDAR</div>
+        <div class="calendar-close-btn" onclick="closeCalendar()">✕</div>
+    </div>
+
+    <!-- 年份与月份切换 -->
+    <div class="calendar-nav">
+        <button class="cal-nav-btn" onclick="changeCalendarYear(-1)">‹</button>
+        <div class="cal-nav-display" id="calendarMonthDisplay">2026年 10月</div>
+        <button class="cal-nav-btn" onclick="changeCalendarYear(1)">›</button>
+        <button class="cal-nav-btn" onclick="jumpToToday()" style="font-size: 12px; padding: 4px 10px;">今天</button>
+    </div>
+
+    <!-- 日历网格 -->
+    <div class="calendar-grid-header">
+        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+        <!-- 日期动态渲染 -->
+    </div>
+
+    <!-- 底部日程抽屉 -->
+    <div class="calendar-drawer" id="calendarDrawer">
+        <div class="drawer-header">
+            <div class="drawer-title" id="calendarDrawerTitle">10月5日 日程</div>
+            <div class="drawer-close" onclick="closeCalendarDrawer()">✕</div>
+        </div>
+        <div class="calendar-schedule-list" id="calendarScheduleList">
+            <!-- 日程动态渲染 -->
+        </div>
+        <div class="calendar-input-area">
+            <input type="text" id="calendarInput" placeholder="添加新的日程..." onkeypress="handleCalendarKeyPress(event)">
+            <button class="calendar-add-btn" onclick="addCalendarSchedule()">添加</button>
+        </div>
+    </div>
+</div>
+
+<!-- 数据吞噬（贪吃蛇） -->
+<div class="snake-overlay" id="snakeOverlay">
+    <div class="snake-header">
+        <div class="snake-title">数据吞噬 · DATA CONSUMPTION</div>
+        <div class="snake-close-btn" onclick="closeSnakeGame()">✕</div>
+    </div>
+
+    <div class="snake-stats">
+        <div>当前得分：<span id="snakeScore">0</span></div>
+        <div>最高得分：<span id="snakeHighScore">0</span></div>
+    </div>
+
+    <!-- 游戏画布 -->
+    <div class="snake-board-container">
+        <canvas id="snakeCanvas" width="300" height="300"></canvas>
+    </div>
+
+    <!-- 移动端方向按钮 -->
+    <div class="snake-controls">
+        <button class="ctrl-btn" onclick="snakeChangeDirection('up')">↑</button>
+        <div class="ctrl-row">
+            <button class="ctrl-btn" onclick="snakeChangeDirection('left')">←</button>
+            <button class="ctrl-btn" onclick="snakeChangeDirection('down')">↓</button>
+            <button class="ctrl-btn" onclick="snakeChangeDirection('right')">→</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- 全屏推演面板（默认隐藏） -->
+<div class="investigation-overlay" id="investigationOverlay">
+    <div class="inv-header">
+        <div class="inv-title" id="invCaseCode">暗影机密调查档案 · SC-KIA-001</div>
+        <div class="inv-close" onclick="closeInvestigation()">✕</div>
+    </div>
+    <div class="inv-content">
+        <div class="inv-profile">
+            <div class="inv-photo">K.I.A.</div>
+            <div class="inv-info">
+                <div class="inv-name">代号：灰狼</div>
+                <div class="inv-role">苏丹港冷链物资护送 · 已确认阵亡</div>
+                <div class="inv-desc">死因不明。遗体被发现时，致命伤在背部，配枪丢失。任务物资被劫。</div>
+            </div>
+        </div>
+        <div class="inv-search-section">
+            <div class="inv-search-title">🔍 加密情报检索 · 点击获取线索</div>
+            <div class="inv-buttons" id="invButtons"></div>
+        </div>
+        <div class="inv-terminal" id="invTerminal">
+            <div class="terminal-line">[SYS] 等待检索指令...</div>
+        </div>
+        <div class="inv-timeline-section">
+            <div class="inv-search-title">📋 行动时间线重组 · 点击两张卡片交换位置</div>
+            <div class="inv-timeline" id="invTimeline"></div>
+        </div>
+                <div class="inv-report-section">
+            <div class="inv-search-title">✍️ 最终推演报告 · 请输入结论</div>
+            <div class="inv-input-group">
+                <input type="text" id="invAnswerWho" placeholder="1. 输入内鬼身份">
+                <input type="text" id="invAnswerWhy" placeholder="2. 输入作案动机">
+                <input type="text" id="invAnswerHow" placeholder="3. 输入致命手段">
+                <input type="text" id="invAnswerWhere" placeholder="4. 输入事发海域">
+                <input type="text" id="invAnswerTrick" placeholder="5. 输入干扰项">
+            </div>
+            <button class="inv-submit-btn" onclick="submitInvestigation()">提交报告 · 等待执行总裁裁定</button>
+        </div>   <!-- 关闭 inv-report-section -->
+    </div>       <!-- 关闭 inv-content -->
+</div>           <!-- 关闭 investigation-overlay -->
+
+<!-- ========== 以下所有弹窗移到 investigation-overlay 外面 ========== -->
+
+<!-- 行动结算弹窗 -->
+<div class="mission-result-modal" id="missionResultModal">
+    <div class="mission-result-card">
+        <div class="mr-title" id="mrTitle">行动结算</div>
+        <div class="mr-desc" id="mrDesc">正在整理行动简报...</div>
+        <div class="mr-stats" id="mrStats">
+            <div class="mr-row"><span>行动代号：</span><span id="mrCode">--</span></div>
+            <div class="mr-row"><span>执行特工：</span><span id="mrAgent">--</span></div>
+            <div class="mr-row"><span>资金变动：</span><span id="mrFunds" style="font-weight:bold;">--</span></div>
+        </div>
+        <div style="margin-top: 20px;">
+            <button class="modal-btn" onclick="closeMissionResult()">确认归档</button>
+        </div>
+    </div>
+</div>
+
+<!-- 任务详情弹窗 -->
+<div class="mission-detail-modal" id="missionDetailModal">
+    <div class="mission-detail-card">
+        <div class="md-title">任务详情 · MISSION DETAIL</div>
+        <div class="md-info-row"><span class="label">任务代号：</span><span class="val" id="mdCode">--</span></div>
+        <div class="md-info-row"><span class="label">任务描述：</span><span class="val" id="mdDesc">--</span></div>
+        <div class="md-info-row"><span class="label">目标坐标：</span><span class="val" id="mdCoords">--</span></div>
+        <div class="md-info-row"><span class="label">执行特工：</span><span class="val" id="mdAgent">--</span></div>
+        <div class="md-info-row"><span class="label">当前状态：</span><span class="val" id="mdStatus">--</span></div>
+        <div class="md-info-row"><span class="label">剩余时间：</span><span class="val" id="mdTimer">--</span></div>
+        <div style="margin-top: 20px;">
+            <button class="modal-btn cancel" onclick="closeMissionDetail()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 坐标输入弹窗 -->
+<div class="dispatch-coord-modal" id="dispatchCoordModal">
+    <div class="modal-content">
+        <div class="modal-title">输入目标坐标 · COORDINATES</div>
+        <div class="coord-inputs">
+            <input type="number" id="dispatchLatInput" placeholder="纬度（如 25.27）" step="0.01">
+            <input type="number" id="dispatchLngInput" placeholder="经度（如 51.21）" step="0.01">
+        </div>
+        <div class="modal-btn-group">
+            <button class="modal-btn cancel" onclick="closeCoordModal()">取消</button>
+            <button class="modal-btn" onclick="confirmDispatch()">确认派遣</button>
+        </div>
+    </div>
+</div>
+
+<!-- 战术部署弹窗 -->
+<div class="deploy-modal-overlay" id="deployModal">
+    <div class="deploy-card">
+        <div class="deploy-title">制定行动路线 · DEPLOYMENT</div>
+        <div class="deploy-option" onclick="selectDeployRoute('stealth', this)">
+            <div class="deploy-icon">🕵️‍♂️</div>
+            <div class="deploy-info"><div class="name">幽灵潜入</div><div class="desc">避开正面冲突，利用夜色和消音装备渗透。高风险，高情报收益。</div></div>
+        </div>
+        <div class="deploy-option" onclick="selectDeployRoute('assault', this)">
+            <div class="deploy-icon">💥</div>
+            <div class="deploy-info"><div class="name">碾压突击</div><div class="desc">呼叫重火力掩护，正面平推。极大概率成功，但容易引起外界注意。</div></div>
+        </div>
+        <div class="deploy-option" onclick="selectDeployRoute('diplomacy', this)">
+            <div class="deploy-icon">💰</div>
+            <div class="deploy-info"><div class="name">钞能力外交</div><div class="desc">重金收买当地线人，铺平退路。零伤亡，但资金消耗极大。</div></div>
+        </div>
+        <div style="margin-top: 20px;">
+            <button class="modal-btn" onclick="startDispatch()" style="width: 100%;">确认出击</button>
+        </div>
+    </div>
+</div>
+
+<!-- 紧急通讯弹窗 -->
+<div class="crisis-modal-overlay" id="crisisModal">
+    <div class="crisis-card">
+        <div class="crisis-title">⚠️ 遭遇突发危机 · CRISIS</div>
+        <div class="crisis-msg" id="crisisMsg">等待通讯接通...</div>
+        <div class="crisis-options" id="crisisOptions">
+            <!-- 选项由 JS 动态渲染 -->
+        </div>
+    </div>
+</div>
+<!-- 无人机视角模拟 -->
+<div class="drone-overlay" id="droneOverlay" onclick="closeDroneView()">
+    <div class="drone-view-content" onclick="event.stopPropagation()">
+        <div class="drone-header">
+            <span id="droneTargetName">目标区域</span>
+            <span style="color: var(--gold);">LIVE · 无人机视角</span>
+        </div>
+        <div class="drone-screen">
+            <div class="drone-grid"></div>
+            <div class="drone-crosshair">+</div>
+            <div class="drone-scan-line"></div>
+            <div class="drone-info">
+                <span id="droneCoords">LAT: 00.000 / LNG: 00.000</span>
+                <span style="color: #e03e3e;">● REC</span>
+            </div>
+        </div>
+        <div class="drone-footer">点击任意位置关闭画面</div>
+    </div>
+</div>
+
+<!-- 抽鬼牌游戏界面 -->
+<div class="card-game-overlay" id="cardGameOverlay">
+    <div class="card-game-header">
+        <div class="card-game-title">暗影赌局 · 抽鬼牌</div>
+        <div class="card-game-close" onclick="closeCardGame()">✕</div>
+    </div>
+    
+    <!-- 格瑞夫斯的区域 -->
+    <div class="opponent-area">
+        <div class="area-label">P. GRAVES · 手牌</div>
+        <div class="hand-container" id="gravesHandArea">
+            <!-- 对手的牌（由JS动态渲染） -->
+        </div>
+    </div>
+
+    <!-- 中间的桌面与提示 -->
+    <div class="table-center">
+        <div id="gameStatusText" class="game-status">"Darlin'，你先抽。我希望你今天手气够好。"</div>
+    </div>
+
+    <!-- 玩家的区域 -->
+    <div class="player-area">
+        <div class="area-label">YOUR HAND · 手牌</div>
+        <div class="hand-container" id="playerHandArea">
+            <!-- 玩家的牌（由JS动态渲染） -->
+        </div>
+    </div>
+</div>
+
+<!-- ================= 补全的弹窗和组件 HTML ================= -->
+
+<!-- 私人银行弹窗 -->
+<div class="bank-overlay" id="bankOverlay">
+    <div class="bank-header"><div class="back-btn" onclick="closeBank()">←</div><div class="title">私人银行账户</div></div>
+    <div class="bank-content">
+        <div class="credit-card">
+            <div class="card-top"><span>SHADOW COMPANY</span><span>BLACK · INFINITE</span></div>
+            <div class="card-chip"></div>
+            <div class="card-number">2140 0000 2017 0923 1111</div>
+            <div class="card-bottom">
+               <div class="card-info">AUTHORIZED PRINCIPAL<br><span class="val" id="cardHolder">P. GRAVES</span></div>
+             <div class="card-info">ETERNAL<br><span class="val">∞ / ∞</span></div>
+             <div class="card-info">CLEARANCE<br><span class="val">•••</span></div>
+            </div>
+        </div>
+        <div class="balance-box"><div class="label">AVAILABLE · 可用余额</div><div class="amount" id="availableBalance">$ 12,047,052,089.10</div></div>
+        <div class="transfer-form">
+            <div class="form-group"><label>收款人姓名 · PAYEE</label><input type="text" placeholder="请输入收款人姓名" id="payeeName"></div>
+            <div class="form-group"><label>收款账号 · ACCOUNT</label><input type="text" placeholder="请输入收款账号" id="payeeAccount"></div>
+            <div class="form-group"><label>转账金额 · AMOUNT</label><input type="number" placeholder="0.00" id="transferAmount"></div>
+            <div class="form-group"><label>币种 · CURRENCY</label><select id="currencySelect"><option value="USD">USD - 美元</option><option value="EUR">EUR - 欧元</option><option value="CNY">CNY - 人民币</option><option value="HKD">HKD - 港币</option></select></div>
+            <div class="form-group"><label>附言 · NOTE (选填)</label><input type="text" placeholder="例如：私人转账 / 感谢" id="transferNote"></div>
+            <button class="submit-btn" onclick="submitTransfer()">激活拨付 · 暗影总裁授权</button>
+        </div>
+    </div>
+</div>
+
+<!-- 聊天弹窗 -->
+<div class="chat-overlay" id="chatOverlay">
+    <div class="chat-overlay-header">
+        <div class="back-btn" onclick="closeChat()">←</div>
+        <div class="chat-title" id="chatTitleName">联系人</div>
+        <div class="chat-status" id="chatStatusTag">加密信道</div>
+        <!-- 新增：仅在小号聊天中显示通话按钮 -->
+        <div id="callButtonContainer" style="display: none; margin-left: auto;">
+            <button onclick="openCallOverlay()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 16px; transition: all 0.2s;">📞</button>
+        </div>
+    </div>
+    <div class="chat-messages-area" id="chatMessagesArea"></div>
+    <div class="chat-input-area" id="chatInputArea">
+        <div class="quick-replies" id="quickReplies"></div>
+        <div class="input-row">
+            <input type="text" id="chatInput" placeholder="输入加密消息..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+</div>
+<!-- 相册弹窗 -->
+<div class="album-overlay" id="albumOverlay">
+    <div class="album-header">
+        <div class="back-btn" onclick="closeAlbum()">←</div>
+        <div class="title">暗影相册 · 核心影像</div>
+    </div>
+    <div class="album-content" id="albumContent"></div>
+</div>
+
+<!-- 简报抽屉 -->
+<div class="briefing-drawer" id="briefingDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">暗影今日简报 · DAILY BRIEFING</div>
+        <div class="drawer-close" onclick="closeBriefing()">✕</div>
+    </div>
+    <div class="briefing-list" id="briefingList"></div>
+</div>
+
+<!-- 控制中心面板（已从登录页隐藏） -->
+<div class="app-center-overlay" id="appCenterOverlay">
+    <div class="app-center-header">
+        <div class="app-center-title-group">
+            <div class="app-center-title">暗影操作系统</div>
+            <div class="app-center-subtitle">SHADOW OS · EXTENDED MODULES</div>
+        </div>
+        <div class="app-center-close" onclick="closeAppCenter()">✕</div>
+    </div>
+    <div class="app-center-grid">
+        <div class="app-icon-item" onclick="openAffectionSystem()"><div class="app-icon">❤️</div><div class="app-name">共感拜访</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('trading')"><div class="app-icon">📈</div><div class="app-name">暗影操盘</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('calculator')"><div class="app-icon">📟</div><div class="app-name">计算器</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('calendar')"><div class="app-icon">📅</div><div class="app-name">暗影日历</div></div>
+        <div class="app-icon-item" onclick="openShadowDatabase()"><div class="app-icon">📁</div><div class="app-name">绝密档案</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('memo')"><div class="app-icon">📝</div><div class="app-name">备忘录</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('armory')"><div class="app-icon">🔫</div><div class="app-name">军火库</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('catering')"><div class="app-icon">🍔</div><div class="app-name">后勤餐饮</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('medical')"><div class="app-icon">🩺</div><div class="app-name">医疗系统</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('personnel')"><div class="app-icon">👥</div><div class="app-name">人事档案</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('tactical')"><div class="app-icon">🧩</div><div class="app-name">战术推演</div></div>
+        <div class="app-icon-item" onclick="openFromAppCenter('canteen')"><div class="app-icon">🍳</div><div class="app-name">暗影食堂</div></div> 
+        <div class="app-icon-item" onclick="openSudokuGame()"><div class="app-icon">🔢</div><div class="app-name">暗影解码</div></div>
+        <div class="app-icon-item" onclick="openClawGame()"><div class="app-icon">🪝</div><div class="app-name">暗影回收</div></div>
+        <div class="app-icon-item" onclick="openMineGame()"><div class="app-icon">💣</div><div class="app-name">暗影扫雷</div></div>
+        <div class="app-icon-item" onclick="openRoulette()"><div class="app-icon">🎰</div><div class="app-name">暗影赌局</div></div>
+        <div class="app-icon-item" onclick="openShadowAirlift()"><div class="app-icon">✈️</div><div class="app-name">暗影空运</div></div>
+        <div class="app-icon-item" onclick="openShadowRunner()"><div class="app-icon">🏃‍♂️</div><div class="app-name">暗影突进</div></div>
+        <div class="app-icon-item" onclick="openMusicPlayer()"><div class="app-icon">📻</div><div class="app-name">加密电台</div></div>
+        <div class="app-icon-item" onclick="openShadowRush()"><div class="app-icon">🏎️</div><div class="app-name">暗影极速</div></div>
+</div>
+</div>
+
+<!-- 特工派遣主界面（包含地球、特工列表） -->
+<div class="dispatch-overlay" id="dispatchOverlay">
+    <div class="dispatch-header">
+        <div class="dispatch-title">全球特工派遣 · SHADOW DISPATCH</div>
+        <div class="dispatch-close-btn" onclick="closeDispatch()">✕</div>
+    </div>
+    <div class="dispatch-earth-container"><canvas id="earthCanvas" width="320" height="320"></canvas></div>
+    <div class="dispatch-funds-box">
+        <div class="funds-label">黑色行动资金 · BLACK OPS FUNDS</div>
+        <div class="funds-amount" id="dispatchFunds">$ 0</div>
+    </div>
+    <div class="dispatch-mission-list" id="dispatchMissionList"></div>
+    <div class="dispatch-agent-selector">
+        <div class="agent-tab active" onclick="switchAgentTab('squad', this)">整支小队</div>
+        <div class="agent-tab" onclick="switchAgentTab('fixed', this)">固定特工</div>
+        <div class="agent-tab" onclick="switchAgentTab('custom', this)">自定义特工</div>
+    </div>
+    <div class="dispatch-agent-list" id="dispatchAgentList"></div>
+    <div class="tactical-comm-log">
+        <div class="comm-header"><span>📡 TACTICAL COMMS · 战术通讯</span><span class="status-blink">● LIVE</span></div>
+        <div class="comm-lines" id="commLogLines"><div class="log-line"><span class="time">[SYS]</span> 等待特工数据链路...</div></div>
+    </div>
+    <div class="kia-entry" onclick="openInvestigation(0)">
+        <div class="kia-icon">☠️</div>
+        <div class="kia-text"><div class="kia-title">KIA 档案 · 灰狼之死</div><div class="kia-sub">苏丹港冷链物资护送真相推演</div></div>
+        <div class="kia-arrow">→</div>
+    </div>
+    <div class="kia-entry" onclick="openInvestigation(1)" style="border-color: #e67e22;">
+        <div class="kia-icon" style="color: #e67e22;">☠️</div>
+        <div class="kia-text"><div class="kia-title" style="color: #e67e22;">KIA 档案 · 弥诺陶事件</div><div class="kia-sub">地中海深海原型机拦截真相推演</div></div>
+        <div class="kia-arrow" style="color: #e67e22;">→</div>
+    </div>
+</div>
+
+<!-- ================= 其他弹窗 ================= -->
+
+<!-- 医疗系统密码验证弹窗 -->
+<div class="medical-auth-modal" id="medicalAuthModal">
+    <div class="modal-content" style="border-color: var(--gold-dim);">
+        <div class="modal-title" style="color: var(--gold);">🔐 安全验证</div>
+        <div class="modal-msg">请输入访问密码进入医疗系统。</div>
+        <input type="password" id="medicalPassInput" placeholder="请输入密码" style="width: 100%; background: transparent; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; color: var(--gold); font-size: 16px; text-align: center; letter-spacing: 4px; margin-bottom: 15px; outline: none;">
+        <div class="modal-btn-group">
+            <button class="modal-btn cancel" onclick="closeMedicalAuth()">取消</button>
+            <button class="modal-btn" onclick="verifyMedicalPass()">确认</button>
+        </div>
+    </div>
+</div>
+
+<!-- 医疗系统主面板 -->
+<div class="medical-drawer" id="medicalDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">私人医疗系统 · MEDICAL</div>
+        <div class="drawer-close" onclick="closeMedical()">✕</div>
+    </div>
+    <div class="medical-tabs">
+        <div class="medical-tab active" onclick="switchMedicalTab('appointment', this)">📅 预约体检</div>
+        <div class="medical-tab" onclick="switchMedicalTab('reports', this)">📋 历史报告</div>
+    </div>
+    <div class="medical-content" id="medicalAppointment">
+        <div class="medical-section-title">选择体检项目</div>
+        <div class="checkup-items" id="checkupItems"></div>
+        <div class="medical-section-title">填写预约信息</div>
+        <div class="medical-form">
+            <input type="text" id="medName" placeholder="姓名（留空默认为执行总裁）">
+            <input type="text" id="medGender" placeholder="性别">
+            <input type="text" id="medAge" placeholder="年龄">
+            <input type="text" id="medAddress" placeholder="住址">
+            <input type="text" id="medPhone" placeholder="联系方式">
+            <input type="datetime-local" id="medDate" placeholder="预约时间" style="color: var(--text-secondary);">
+        </div>
+        <button class="checkout-submit" onclick="submitMedicalAppointment()">提交预约申请</button>
+    </div>
+    <div class="medical-content" id="medicalReports" style="display: none;">
+        <div class="medical-section-title">历史体检报告</div>
+        <div class="report-list" id="reportList"></div>
+    </div>
+</div>
+
+<!-- 后勤餐饮抽屉 -->
+<div class="catering-drawer" id="cateringDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">后勤餐饮 · CATERING</div>
+        <div class="drawer-close" onclick="closeCatering()">✕</div>
+    </div>
+    <div class="catering-tabs" id="cateringTabs">
+        <div class="catering-tab active" onclick="switchCateringTab('meat', this)">肉食</div>
+        <div class="catering-tab" onclick="switchCateringTab('vegetables', this)">蔬菜</div>
+        <div class="catering-tab" onclick="switchCateringTab('fruits', this)">水果</div>
+        <div class="catering-tab" onclick="switchCateringTab('carbs', this)">碳水</div>
+        <div class="catering-tab" onclick="switchCateringTab('desserts', this)">甜点</div>
+    </div>
+    <div class="catering-list" id="cateringList"></div>
+</div>
+
+<!-- 悬浮购物车按钮 -->
+<div class="cart-fab" id="cartFab" onclick="openCheckout()">🛒<span class="cart-count" id="cartCount">0</span></div>
+
+<!-- 结算面板（购物车结算） -->
+<div class="checkout-overlay" id="checkoutOverlay">
+    <div class="checkout-panel">
+        <div class="checkout-items" id="checkoutItems"></div>
+ <div class="checkout-admin-row">
+            <span class="checkout-admin-label">
+                行政拨划<br>
+                <span class="checkout-admin-sub">EXECUTIVE DISBURSEMENT</span>
+            </span>
+            <span class="checkout-admin-value">$0.00</span>
+        </div>
+        <div class="checkout-address">
+            <label>配送地址 · DELIVERY ADDRESS</label>
+            <input type="text" id="deliveryAddress" placeholder="默认地址（德克萨斯庄园）">
+        </div>
+        <button class="checkout-submit" onclick="submitOrder()">提交订单</button>
+    </div>
+</div>
+
+<!-- ================= 好感拜访互动系统 ================= -->
+<div class="affection-overlay" id="affectionOverlay">
+    <div class="affection-header">
+        <div class="affection-title">好感拜访 · AFFECTION VISIT</div>
+        <div class="affection-close" onclick="closeAffectionSystem()">✕</div>
+    </div>
+
+    <!-- 好感度显示 -->
+    <div class="affection-score-bar">
+        <span>当前好感度</span>
+        <span class="score-num" id="affectionScoreDisplay">0</span>
+    </div>
+
+   <div class="affection-avatar-area" id="affectionAvatarArea">
+    <div class="character-wrapper" id="characterWrapper">
+        <img src="base.png" class="layer base-layer" draggable="false">
+        <img src="calm.png" class="layer expression-layer active" id="expr-calm" draggable="false">
+        <img src="surprise.png" class="layer expression-layer" id="expr-surprise" draggable="false">
+        <img src="angry.png" class="layer expression-layer" id="expr-angry" draggable="false">
+        <img src="cry.png" class="layer expression-layer" id="expr-cry" draggable="false">
+        <img src="smirk.png" class="layer expression-layer" id="expr-smirk" draggable="false">
+    </div>
+    <!-- 粒子特效层（爱心、火焰等漂浮物） -->
+    <div class="particle-container" id="particleContainer"></div>
+</div>
+
+    <!-- 对话框 -->
+    <div class="affection-dialogue-box">
+        <div class="affection-dialogue" id="affectionDialogue">"Darlin'，你今天怎么想起点开这个终端了？"</div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="affection-actions">
+        <button onclick="interactWithGraves('pat')">摸头</button>
+        <button onclick="interactWithGraves('kiss')">亲亲</button>
+        <button onclick="interactWithGraves('pinch')">捏脸</button>
+        <button onclick="interactWithGraves('transfer')">转账100$</button>
+        <button onclick="interactWithGraves('ignore')" class="danger-btn">骗他说不理他</button>
+    </div>
+</div>
+
+<!-- ================= 战术加密电话 ================= -->
+<div class="call-overlay" id="callOverlay">
+    <div class="call-header">
+        <div class="call-status"><span class="blink-dot"></span> 加密信道已建立</div>
+        <div class="call-timer" id="callTimer">00:00</div>
+    </div>
+    
+    <div class="call-avatar-area">
+    <!-- 这里是你新的图片，名字自己改 -->
+    <img src="call.jpg" alt="Graves" class="call-avatar-img">
+    <div class="call-spectrum">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div>
+    </div>
+</div>
+
+    <div class="call-subtitle-box">
+        <div class="subtitle-line" id="callSubtitle">正在接通...</div>
+    </div>
+
+<!-- 🌟 新增：通话文本输入框 -->
+    <div class="call-input-area" style="display: flex; gap: 10px; padding: 0 20px 15px 20px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
+        <input type="text" id="callTextInput" placeholder="输入通话内容..." autocomplete="off"
+               style="flex: 1; background: transparent; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; color: var(--text-primary); outline: none; font-size: 14px; transition: border 0.2s;"
+               onfocus="this.style.borderColor='var(--gold-dim)'" onblur="this.style.borderColor='var(--border-color)'"
+               onkeypress="if(event.key === 'Enter') sendCallText()">
+        <button onclick="sendCallText()" style="background: var(--gold-gradient); color: var(--bg-dark); border: none; border-radius: 8px; padding: 0 20px; font-weight: bold; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">发送</button>
+    </div>
+
+    <div class="call-actions">
+        <button class="call-btn mute" id="callMuteBtn" onclick="toggleCallMute()">🎤</button>
+        <button class="call-btn hangup" onclick="hangupCall()">📞</button>
+        <button class="call-btn text" onclick="switchToTextChat()">💬</button>
+    </div>
+</div>
+
+<!-- 营养师警告弹窗 -->
+<div class="nutritionist-modal" id="nutritionistModal">
+    <div class="modal-content">
+        <div class="modal-title">?? 营养师拦截</div>
+        <div class="modal-msg" id="nutritionistMsg">检测到不健康饮食，是否强制下单？</div>
+        <div class="modal-btn-group">
+    <button class="modal-btn cancel" onclick="cancelPayment()">取消拨划</button>
+    <button class="modal-btn" onclick="exemptAndPay()">强制拨划</button>
+</div>
+    </div>
+</div>
+
+<!-- 贪吃蛇结算弹窗 -->
+<div class="snake-modal-overlay" id="snakeModalOverlay">
+    <div class="snake-modal-card">
+        <div class="snake-modal-title">数据连接中断</div>
+        <div class="snake-modal-desc">最高得分：<span id="snakeFinalScore">0</span></div>
+        <div class="snake-modal-comment" id="snakeComment">系统正在评估...</div>
+        <div class="snake-modal-actions">
+            <button class="modal-btn" onclick="resetSnakeGame()">重新潜入</button>
+            <button class="modal-btn cancel" onclick="closeSnakeModal()">退出系统</button>
+        </div>
+    </div>
+</div>
+
+<!-- 坎布雷亚事件绝密档案弹窗 -->
+<div class="raven-overlay" id="ravenOverlay">
+    <div class="raven-header">
+        <div class="raven-title">📁 绝密卷宗 · 坎布雷亚事件</div>
+        <div class="raven-close" onclick="closeRavenArchive()">✕</div>
+    </div>
+
+    <div class="raven-meta">
+        <div class="raven-meta-title">美国海军陆战队 机密档案</div>
+        <div class="raven-meta-info">
+            卷宗编号：USMC-ARCH-15-1104<br>
+            事件名称：坎布雷亚事件 (Cambrea Incident)<br>
+            归档单位：海军陆战队第一侦察营 / 联合指挥部档案室
+        </div>
+    </div>
+
+    <div class="raven-section">
+        <div class="raven-section-title">一、 行动背景与任务目标</div>
+        <div class="raven-official">
+            <strong>任务指令：</strong>潜入东欧交战区，获取包含生化武器配方的高危“机密硬盘”。<br>
+            <strong>参战编制：</strong>突击组（Helios 太阳神小队，核心16人，指挥官：菲利普·格瑞夫斯上尉）；外围支援组 80人。<br>
+            <strong>情报评估：</strong>目标区域仅有约50名非正规武装驻守。战后调查显示敌方实际兵力逾200人，配备重火力。
+        </div>
+        <div class="raven-graves">
+            地图上标注的50名杂牌武装，实际是200名拥有重火力的雇佣兵。情报误差过大，这是事件爆发的起点。
+        </div>
+    </div>
+
+    <div class="raven-section">
+        <div class="raven-section-title">二、 战斗通讯与战术记录（摘要）</div>
+        
+        <div class="raven-official" style="margin-bottom: 5px;">
+            <strong>【11月1日 05:30 · 第一次呼叫】</strong><br>
+            遭遇伏击，瞬间发生伤亡。Graves呼叫请求火力压制与撤离。<br>
+            指挥部回复：“支援正在路上，保持防线等待接应。”<br>
+            <em>(调查附注：此阶段指挥部已关闭该小队所有通讯备份频段，并撤回了原定接应直升机的飞行许可。)</em>
+        </div>
+        <div class="raven-graves">
+            呼叫时已阵亡2人，重伤3人。后备频段被关闭，路线被取消。指挥部的“支援”承诺与事实不符，客观上构成了信息阻断。
+        </div>
+
+        <div class="raven-official" style="margin-bottom: 5px;">
+            <strong>【11月2日 14:00 · 第二次呼叫】</strong><br>
+            被围困超32小时，伤员失血失温。Graves请求接应坐标。<br>
+            指挥部回复：“最近接应点在某海港废弃码头。沿岸备有接应小艇，自行前往。”<br>
+            <em>(现场调查记录：小队突围至码头后，发现该“接应小艇”实际为一艘核载2人的微型橡皮艇。无法满足小队撤离需求。)</em>
+        </div>
+        <div class="raven-graves">
+            我们突围至码头，发现所谓“接应小艇”仅核载2人。小队16人，减去阵亡，仍有10人。这艘船的安排，在战术上没有提供撤离可行性，只分化了队伍的生存名额。
+        </div>
+
+        <div class="raven-official">
+            <strong>【11月3日 09:00 · 第三次呼叫】</strong><br>
+            伤亡率超30%。Graves请求立即支援。<br>
+            指挥部回复：“立刻派出支援另一支小队的成本太高，风险太大。你们自行寻找安全点等待救援。指挥中心结束。”<br>
+            <em>(调查附注：此后共计十余次呼叫，均未获得回应。)</em>
+        </div>
+        <div class="raven-graves">
+            无线电中记录的原话是“成本太高，风险太大”。指挥部的计算逻辑合理：对高层而言，我们不再是有生力量，而是需要被清理的沉没成本。
+        </div>
+    </div>
+
+    <div class="raven-section">
+        <div class="raven-section-title">三、 伤亡统计与突围结果</div>
+        <div class="raven-official" style="margin-bottom: 5px;">
+            <strong>战斗环境：</strong>东欧严寒冰原，最低气温零下15度，战斗持续72小时。<br>
+            <strong>最终伤亡：</strong>核心16人，阵亡4人，重伤7人（含终身残疾），指挥官格瑞夫斯右臂中弹负伤。<br>
+            <strong>突围记录：</strong>小队在无补给、无火力支援的条件下，依靠缴获敌军弹药和近身肉搏，成功撕开防线，带回10名幸存者。
+        </div>
+        <div class="raven-graves">
+            4人阵亡，7人重伤。如果用官方提供的2人小艇撤退，这个数字还会更难看。我们靠自己杀出来了，但依然无法改变编制严重减员的事实。
+        </div>
+    </div>
+
+    <div class="raven-section">
+        <div class="raven-section-title">四、 联合调查委员会 最终裁定</div>
+        <div class="raven-official" style="margin-bottom: 5px;">
+            <strong>1. 行动负责人责任认定：</strong>行动负责人维纳斯（Venus）少将，未能有效协调情报与后勤保障部门。经裁定，给予“内部处分”，不影响其后续职务晋升。<br><br>
+            <strong>2. Helios小队定性：</strong>在极端环境下表现突出，但存在“违规偏离原定任务”、“未按指令原地待命”、“擅自强行突围”等行为。根据《军事行动纪律条例》，<strong>功过相抵，不予表彰，不予追究。</strong><br><br>
+            <strong>委员会结案陈词：</strong>“这是一次因战场信息不对称导致的悲剧性误会。五角大楼对此深表遗憾。希望格瑞夫斯上尉和他的小队能够理解，战术上的牺牲是为了战略上的大局。”
+        </div>
+        <div class="raven-graves">
+            维纳斯少将保留职务。小队阵亡4人，重伤7人，无功无过。错误指令的签发者保留了职务，在正确方向上拼死突围的人被抹去了功绩。整件事缺乏基本的逻辑闭环。<br><br>
+            这份裁定下发当天，我向军部提交了退伍申请。我的小队中，有12人自愿退役随我离开。我将这次行动的全部通讯录音、作战记录和裁定书副本提取并留存。它将成为我建立新公司的底线标尺——既然规则无法保护前线的人，那么我们就只相信契约、火力和自己人。
+        </div>
+    </div>
+
+    <div class="raven-signature" style="text-align: left;">
+    <!-- 官方留存的内容 -->
+    <div style="font-weight: bold; color: var(--text-primary); margin-bottom: 8px; font-size: 12px;">【档案结尾 · 官方留存】</div>
+    <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 10px;">
+        委员会备注：该员已于11月23日办理强制退役手续。携带核心技术骨干12人离开。<br>
+        警告：该员对军方常规调度产生深度不信任。建议情报部门将其列入观察名单。
+    </div>
+
+    <!-- 格瑞夫斯的嗤之以鼻 -->
+    <div class="raven-graves" style="margin-left: 0; margin-top: 15px;">
+        还是在遗憾我没死在大雪里？可惜了那座你们给我留的“丰碑”了。
+    </div>
+
+    <!-- 落款 -->
+    <div style="text-align: right; margin-top: 15px; line-height: 1.8;">
+        归档员：M. Reynolds 上士<br>
+        审核官：J. P. Harrison 少将<br>
+        归档日期：2015年11月31日<br>
+        <span style="color: #e03e3e; font-weight: bold;">档案封存：视同结案</span>
+    </div>
+</div>
+
+
+<!-- ================= 暗影食堂 · 小游戏 ================= -->
+<div class="canteen-overlay" id="canteenOverlay">
+
+    <!-- 屏幕 1：开店 / 打烊 菜单 -->
+    <div class="canteen-screen active" id="canteenMenuScreen">
+        <div class="canteen-top-bar">
+            <div class="canteen-top-spacer"></div>
+            <div class="canteen-close-day-btn" onclick="var el=document.getElementById('canteenOverlay'); if(el){el.classList.remove('active'); el.style.display='none';}">✕</div>
+        </div>
+        <div class="canteen-menu-body">
+            <div class="canteen-menu-logo">🍳</div>
+            <div class="canteen-menu-title">暗影食堂</div>
+            <div class="canteen-menu-subtitle">SHADOW CANTEEN</div>
+            <div class="canteen-menu-stats">
+                <div class="canteen-stat-row"><span>当前进度</span><span id="canteenDayDisplay">第 1 天</span></div>
+                <div class="canteen-stat-row"><span>累计收入</span><span id="canteenTotalRevenue">$0</span></div>
+                <div class="canteen-stat-row"><span>店铺评级</span><span id="canteenStoreLevel">未评级</span></div>
+                <div class="canteen-stat-row"><span>完美订单</span><span id="canteenPerfectCount">0 单</span></div>
+            </div>
+        </div>
+        <div class="canteen-menu-actions">
+            <button class="canteen-btn-primary" onclick="startCanteenDay()">开 始 营 业</button>
+            <button class="canteen-btn-secondary" onclick="var el=document.getElementById('canteenOverlay'); if(el){el.classList.remove('active'); el.style.display='none';} document.querySelectorAll('.canteen-modal.active').forEach(function(m){m.classList.remove('active');});">打 烊</button>
+        </div>
+    </div>
+
+    <!-- 屏幕 2：恢复进度 -->
+    <div class="canteen-screen" id="canteenResumeScreen">
+        <div class="canteen-menu-body">
+            <div class="canteen-menu-logo">📋</div>
+            <div class="canteen-menu-title">检测到未完成的营业</div>
+            <div class="canteen-menu-subtitle">UNFINISHED SESSION</div>
+            <div class="canteen-menu-stats">
+                <div class="canteen-stat-row"><span>进行到</span><span id="resumeDayDisplay">第 1 天</span></div>
+                <div class="canteen-stat-row"><span>已完成</span><span id="resumeOrderDisplay">0 / 9 订单</span></div>
+                <div class="canteen-stat-row"><span>今日收入</span><span id="resumeRevenueDisplay">$0</span></div>
+            </div>
+        </div>
+        <div class="canteen-menu-actions">
+            <button class="canteen-btn-primary" onclick="resumeCanteenDay()">继 续 营 业</button>
+            <button class="canteen-btn-secondary" onclick="restartCanteenDay()">重 新 开 始 今 天</button>
+        </div>
+    </div>
+
+    <!-- 屏幕 3：营业中 -->
+    <div class="canteen-screen" id="canteenGameScreen">
+        <div class="canteen-top-bar">
+            <div class="canteen-back-btn" onclick="pauseCanteen()">🔙</div>
+            <div class="canteen-progress" id="canteenProgress">第 1 天 · 订单 1/9</div>
+            <div class="canteen-close-day-btn" onclick="confirmCloseDay()">🌙 打烊</div>
+        </div>
+        <div class="canteen-resource-bar">
+            <span id="canteenMoney">💰 $0</span>
+            <span id="canteenRepute">⭐ 50</span>
+            <span id="canteenTimer">⏱️ --</span>
+        </div>
+        <div class="canteen-customer-area" id="canteenCustomerArea">
+            <!-- 顾客信息由 JS 渲染 -->
+        </div>
+        <div class="canteen-food-panel" id="canteenFoodPanel">
+            <!-- 食材网格由 JS 渲染 -->
+        </div>
+        <div class="canteen-cooking-station" id="canteenCookingStation">
+            <!-- 料理台由 JS 渲染 -->
+        </div>
+        <div class="canteen-action-bar" id="canteenActionBar">
+            <!-- 按钮由 JS 渲染 -->
+        </div>
+    </div>
+
+    <!-- 弹窗：配方速查 -->
+    <div class="canteen-modal" id="canteenRecipeModal">
+        <div class="canteen-modal-card">
+            <div class="canteen-modal-title">📖 配方速查</div>
+            <div class="canteen-recipe-list" id="canteenRecipeList"></div>
+            <button class="canteen-btn-secondary" onclick="closeCanteenRecipe()">关闭</button>
+        </div>
+    </div>
+
+    <!-- 弹窗：评分结果 -->
+    <div class="canteen-modal" id="canteenRatingModal">
+        <div class="canteen-modal-card">
+            <div class="canteen-rating-icon" id="canteenRatingIcon">🌟</div>
+            <div class="canteen-rating-title" id="canteenRatingTitle">很好吃</div>
+            <div class="canteen-rating-desc" id="canteenRatingDesc"></div>
+            <div class="canteen-rating-pay" id="canteenRatingPay">$0</div>
+            <button class="canteen-btn-primary" onclick="closeCanteenRating()">下一位 →</button>
+        </div>
+    </div>
+
+    <!-- 弹窗：日终结算 -->
+    <div class="canteen-modal" id="canteenDayEndModal">
+        <div class="canteen-modal-card">
+            <div class="canteen-modal-title" id="canteenDayEndTitle">经营日 #1 · 结算</div>
+            <div class="canteen-day-summary" id="canteenDaySummary"></div>
+            <button class="canteen-btn-primary" onclick="closeCanteenDayEnd()">进入下一天</button>
+        </div>
+    </div>
+
+    <!-- 弹窗：10 日店铺评级 -->
+    <div class="canteen-modal" id="canteenStoreRankModal">
+        <div class="canteen-modal-card">
+            <div class="canteen-modal-title">🏆 10 日店铺评级</div>
+            <div class="canteen-store-rank" id="canteenStoreRank">B+</div>
+            <div class="canteen-store-comment" id="canteenStoreComment"></div>
+            <button class="canteen-btn-primary" onclick="closeCanteenStoreRank()">确认</button>
+        </div>
+    </div>
+
+    <!-- 弹窗：打烊确认 -->
+    <div class="canteen-modal" id="canteenCloseConfirmModal">
+        <div class="canteen-modal-card">
+            <div class="canteen-modal-title">🌙 现在打烊吗？</div>
+            <div class="canteen-modal-desc" id="canteenCloseConfirmDesc"></div>
+            <div class="canteen-modal-actions">
+                <button class="canteen-btn-secondary" onclick="cancelCloseDay()">继续营业</button>
+                <button class="canteen-btn-danger" onclick="doCloseDay()">确认打烊</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：暂停菜单 -->
+    <div class="canteen-modal" id="canteenPauseModal">
+        <div class="canteen-modal-card">
+            <div class="canteen-modal-title">暂停</div>
+            <div class="canteen-modal-desc">营业进度已自动保存。可以放心离开。</div>
+            <div class="canteen-modal-actions">
+                <button class="canteen-btn-primary" onclick="resumeCanteen()">继续营业</button>
+                <button class="canteen-btn-secondary" onclick="exitCanteenToMenu()">回到主菜单</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 暗影数独 -->
+<div class="sd-overlay" id="sdOverlay">
+    <div class="sd-header">
+        <div class="sd-title">暗影解码 · SUDOKU</div>
+<div class="sd-timer" id="sdTimerDisplay">15:00</div>
+        <div class="sd-close" onclick="closeSudokuGame()">✕</div>
+    </div>
+    <div class="sd-board-wrapper">
+        <div class="sd-board" id="sdBoard">
+            <!-- 格子由 JS 动态渲染 -->
+        </div>
+    </div>
+    <div class="sd-numpad" id="sdNumpad">
+        <button class="sd-btn" onclick="sdInputNumber(1)">1</button>
+        <button class="sd-btn" onclick="sdInputNumber(2)">2</button>
+        <button class="sd-btn" onclick="sdInputNumber(3)">3</button>
+        <button class="sd-btn" onclick="sdInputNumber(4)">4</button>
+        <button class="sd-btn" onclick="sdInputNumber(5)">5</button>
+        <button class="sd-btn" onclick="sdInputNumber(6)">6</button>
+        <button class="sd-btn" onclick="sdInputNumber(7)">7</button>
+        <button class="sd-btn" onclick="sdInputNumber(8)">8</button>
+        <button class="sd-btn" onclick="sdInputNumber(9)">9</button>
+        <button class="sd-btn sd-clear" onclick="sdClearCell()">清除</button>
+        <button class="sd-btn" id="sdNoteBtn" onclick="sdToggleNote()">笔记</button>
+        <button class="sd-btn sd-restart" onclick="sdRestart()">重新开始</button>
+ </div>
+<div class="sd-result-overlay" id="sdResultOverlay">
+        <div class="sd-result-card">
+            <div class="sd-result-title" id="sdResultTitle">解码成功</div>
+            <div class="sd-result-rank" id="sdResultRank">S</div>
+            <div class="sd-result-desc" id="sdResultDesc">正在评估行动表现...</div>
+            <div class="sd-result-actions">
+                <button onclick="sdRestart()">重新推演</button>
+                <button onclick="closeSudokuGame()">退出系统</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 暗影回收 · 抓取游戏 -->
+<div class="claw-overlay" id="clawOverlay">
+    <div class="claw-header">
+        <div>关卡：<span id="clawLevelDisplay">1 / 4</span></div>
+        <div>得分：<span id="clawScoreDisplay">0</span></div>
+        <div>时间：<span id="clawTimeDisplay">30s</span></div>
+        <div class="claw-close" onclick="closeClawGame()">✕</div>
+    </div>
+    
+    <div class="claw-board-wrapper">
+        <canvas id="clawCanvas" width="360" height="450"></canvas>
+        
+        <!-- 右上角格瑞夫斯陪伴 -->
+        <div class="claw-companion">
+            <div class="claw-avatar">🤠</div>
+            <div class="claw-bubble" id="clawBubble">Darlin'，动作快点，别让我等。</div>
+        </div>
+    </div>
+
+    <div class="claw-action-area">
+        <button class="claw-shoot-btn" id="clawShootBtn" onclick="clawShoot()">发 射 钩 索</button>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div class="claw-result-overlay" id="clawResultOverlay">
+        <div class="claw-result-card">
+            <div class="claw-result-title">回收行动结束</div>
+            <div class="claw-result-score" id="clawFinalScore">0</div>
+            <div class="claw-result-rank" id="clawFinalRank">S</div>
+            <div class="claw-result-desc" id="clawFinalDesc">正在评估行动表现...</div>
+            <div class="claw-result-actions">
+                <button onclick="clawRestart()">重新开始</button>
+                <button onclick="closeClawGame()">退出系统</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 暗影扫雷 -->
+<div class="mine-overlay" id="mineOverlay">
+    <div class="mine-header">
+        <div class="mine-title">暗影扫雷 · MINESWEEPER</div>
+        <div class="mine-close" onclick="closeMineGame()">✕</div>
+    </div>
+
+    <div class="mine-stats">
+        <div>💣<span id="mineRemaining">10</span></div>
+        <div>⏱️<span id="mineTimer">00:00</span></div>
+        <div class="mine-diff-tag" id="mineDiffTag">简单</div>
+    </div>
+
+    <div class="mine-board-wrapper">
+        <div class="mine-board" id="mineBoard"></div>
+    </div>
+
+    <div class="mine-controls">
+        <button class="mine-mode-btn active-mode" id="mineModeBtn" onclick="mineToggleMode()">⛏️ 挖开</button>
+        <button onclick="mineRestart()">重开</button>
+        <button onclick="mineCycleDifficulty()">切换难度</button>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div class="mine-result-overlay" id="mineResultOverlay">
+        <div class="mine-result-card">
+            <div class="mine-result-title" id="mineResultTitle">扫雷结束</div>
+            <div class="mine-result-rank" id="mineResultRank">S</div>
+            <div class="mine-result-desc" id="mineResultDesc">正在评估...</div>
+            <div class="mine-result-actions">
+                <button onclick="mineRestart()">再来一局</button>
+                <button onclick="closeMineGame()">退出系统</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 暗影赌局 · 俄罗斯轮盘 -->
+<div class="rl-overlay" id="rouletteOverlay">
+    <div class="rl-header">
+        <div class="rl-title">暗影赌局 · RUSSIAN ROULETTE</div>
+        <div class="rl-close" onclick="closeRoulette()">✕</div>
+    </div>
+
+    <!-- 下注界面 -->
+    <div class="rl-screen active" id="rlBetScreen">
+        <div class="rl-funds-display">
+            <span>黑色行动资金</span>
+            <span id="rlFundsAmount">$0</span>
+        </div>
+        <div class="rl-bet-title">选择你的赌注 · SELECT YOUR BET</div>
+        <div class="rl-bet-options" id="rlBetOptions"></div>
+        <div class="rl-bet-preview">
+            <div><span>赢了 · 净赚 2 倍</span><span class="win" id="rlWinPreview">+ $0</span></div>
+            <div><span>输了 · 净赔 2 倍</span><span class="lose" id="rlLosePreview">- $0</span></div>
+            <div style="color:var(--text-muted); font-size:10px; border-top:1px solid var(--border-color); padding-top:8px; margin-top:4px;">
+                规则：双方各 3 条命。每局轮流扣扳机，中枪方 -1 命。命归零者败。
+            </div>
+        </div>
+        <button class="rl-confirm-btn" id="rlConfirmBtn" onclick="rouletteConfirmBet()" disabled>确 认 下 注</button>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div class="rl-screen" id="rlGameScreen">
+        <div class="rl-life-bar">
+            <div class="rl-life-side">
+                <div class="rl-life-label">你</div>
+                <div class="rl-hearts" id="rlPlayerHearts">❤️❤️❤️</div>
+            </div>
+            <div class="rl-vs">VS</div>
+            <div class="rl-life-side">
+                <div class="rl-life-label">P. GRAVES</div>
+                <div class="rl-hearts" id="rlGravesHearts">❤️❤️❤️</div>
+            </div>
+        </div>
+
+        <div class="rl-revolver-area">
+            <div class="rl-revolver">
+                <div class="rl-cylinder" id="rlCylinder">
+                    <div class="rl-chamber"></div>
+                    <div class="rl-chamber"></div>
+                    <div class="rl-chamber"></div>
+                    <div class="rl-chamber"></div>
+                    <div class="rl-chamber"></div>
+                    <div class="rl-chamber"></div>
+                </div>
+            </div>
+            <div class="rl-round-info">
+                第 <span id="rlRoundNum">1</span> 局 · 本局子弹 <span id="rlBulletsCount">1</span> 颗
+            </div>
+        </div>
+
+        <div class="rl-status-text" id="rlStatusText">准备就绪</div>
+
+        <div class="rl-graves-bubble" id="rlGravesBubble">Darlin'，确定要玩这个？</div>
+
+        <div class="rl-action-buttons">
+            <button class="rl-btn-primary" id="rlTriggerBtn" onclick="roulettePullTrigger()">扣 动 扳 机</button>
+            <button class="rl-btn-danger" onclick="rouletteSurrender()">认赔退出</button>
+        </div>
+    </div>
+
+    <!-- 局结算弹窗 -->
+    <div class="rl-modal" id="rlRoundEndModal">
+        <div class="rl-modal-card">
+            <div class="rl-modal-title" id="rlRoundEndTitle">第 1 局结束</div>
+            <div class="rl-modal-desc" id="rlRoundEndDesc"></div>
+            <button class="rl-btn-primary" id="rlNextRoundBtn" onclick="rouletteNextRound()" style="width:100%;">继续下一局</button>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div class="rl-modal" id="rlGameOverModal">
+        <div class="rl-modal-card">
+            <div class="rl-modal-title" id="rlGameOverTitle">赌局结束</div>
+            <div class="rl-modal-rank win" id="rlGameOverRank">WIN</div>
+            <div class="rl-modal-desc" id="rlGameOverDesc"></div>
+            <button class="rl-btn-primary" onclick="closeRoulette()" style="width:100%;">退 出 赌 局</button>
+        </div>
+    </div>
+</div>
+
+<!-- 暗影空运 · 飞行棋 -->
+<div class="sa-overlay" id="saOverlay">
+    <div class="sa-header">
+        <div class="sa-title">暗影空运 · SHADOW AIRLIFT</div>
+        <div class="sa-close" onclick="closeShadowAirlift()">✕</div>
+    </div>
+
+    <!-- 下注界面 -->
+    <div class="sa-screen active" id="saBetScreen">
+        <div class="sa-funds-display">
+            <span>黑色行动资金</span>
+            <span id="saFundsAmount">$0</span>
+        </div>
+        <div class="sa-bet-title">选择你的赌注</div>
+        <div class="sa-bet-options" id="saBetOptions"></div>
+        <div class="sa-bet-preview">
+            <div><span>赢了 · 净赚 2 倍</span><span class="win" id="saWinPreview">+ $0</span></div>
+            <div><span>输了 · 净赔 2 倍</span><span class="lose" id="saLosePreview">- $0</span></div>
+            <div class="sa-rules">规则：双方各 2 架运输机。从德州出发，先让两架全部抵达加勒比者胜。<br>路线：德州 → 乌克兰 → 欧洲 → 中东 → 缅甸 → 加勒比。</div>
+        </div>
+        <button class="sa-confirm-btn" id="saConfirmBtn" onclick="saConfirmBet()" disabled>确 认 下 注</button>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div class="sa-screen" id="saGameScreen">
+        <div class="sa-status-bar">
+            <div class="sa-status-side">
+                <span>你</span>
+                <span class="sa-progress" id="saPlayerProgress">0 / 2</span>
+            </div>
+            <div class="sa-vs">VS</div>
+            <div class="sa-status-side">
+                <span>P. GRAVES</span>
+                <span class="sa-progress" id="saGravesProgress">0 / 2</span>
+            </div>
+        </div>
+
+        <div class="sa-board" id="saBoard"></div>
+
+        <div class="sa-dice-area">
+            <div class="sa-dice" id="saDice">🎲</div>
+            <button class="sa-dice-btn" id="saDiceBtn" onclick="saRollDice()">掷 骰 子</button>
+        </div>
+
+        <div class="sa-plane-selector" id="saPlaneSelector">
+            <div class="sa-plane-card disabled" id="saPlane0" onclick="saSelectPlane(0)">
+                <div>运输机 A</div>
+                <div class="sa-plane-pos" id="saPlane0Pos">位置 0</div>
+                <div class="sa-plane-tag" id="saPlane0Tag">德州</div>
+            </div>
+            <div class="sa-plane-card disabled" id="saPlane1" onclick="saSelectPlane(1)">
+                <div>运输机 B</div>
+                <div class="sa-plane-pos" id="saPlane1Pos">位置 0</div>
+                <div class="sa-plane-tag" id="saPlane1Tag">德州</div>
+            </div>
+        </div>
+
+        <div class="sa-graves-bubble" id="saGravesBubble">Darlin'，准备好起飞了吗？</div>
+    </div>
+
+    <!-- 事件弹窗 -->
+    <div class="sa-modal" id="saEventModal">
+        <div class="sa-modal-card">
+            <div class="sa-modal-title" id="saEventTitle">事件</div>
+            <div class="sa-event-icon" id="saEventIcon">🎯</div>
+            <div class="sa-modal-desc" id="saEventDesc"></div>
+            <button class="sa-btn-primary" onclick="saCloseEventModal()" style="width:100%;">确 认</button>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div class="sa-modal" id="saGameOverModal">
+        <div class="sa-modal-card">
+            <div class="sa-modal-title" id="saGameOverTitle">游戏结束</div>
+            <div class="sa-modal-rank win" id="saGameOverRank">WIN</div>
+            <div class="sa-modal-desc" id="saGameOverDesc"></div>
+            <button class="sa-btn-primary" onclick="closeShadowAirlift()" style="width:100%;">退 出</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- 暗影突进 · 跑酷 -->
+<div class="sr-overlay" id="srOverlay">
+    <div class="sr-header">
+        <div class="sr-title">暗影突进 · SHADOW RUNNER</div>
+        <div class="sr-close" onclick="closeShadowRunner()">✕</div>
+    </div>
+    
+    <div class="sr-score-board">
+        <div>距离：<span id="srScore">0</span> m</div>
+        <div>最高：<span id="srHighScore">0</span> m</div>
+    </div>
+
+    <div class="sr-canvas-wrapper">
+        <canvas id="srCanvas"></canvas>
+    </div>
+
+    <!-- 电脑/手机通用大按钮 -->
+    <div class="sr-controls">
+        <div class="sr-ctrl-btn" id="srBtnJump">
+            ⬆ 跳跃 <span>(Space / 上键)</span>
+        </div>
+        <div class="sr-ctrl-btn" id="srBtnDown">
+            ⬇ 滑铲 <span>(下键 / 长按)</span>
+        </div>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div class="sr-modal" id="srModal">
+        <div class="sr-modal-card">
+            <div class="sr-modal-title">行动失败</div>
+            <div class="sr-modal-rank" id="srFinalScore">0 m</div>
+            <div class="sr-modal-desc" id="srModalDesc">格瑞夫斯正在赶来...</div>
+            <button class="sr-btn" onclick="srRestart()">重试突围</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全屏电台界面 -->
+<div class="music-overlay" id="musicOverlay">
+    <div class="music-bg" id="musicBg"></div>
+    <div class="music-header">
+        <div class="music-title">暗影加密电台 · SHADOW RADIO</div>
+        <div class="music-close" onclick="closeMusicPlayer()">✕</div>
+    </div>
+
+    <div class="music-main">
+        <!-- 唱片机 -->
+        <div class="vinyl-container">
+            <div class="vinyl-disc" id="vinylDisc">
+                <div class="vinyl-label"></div>
+            </div>
+            <div class="tonearm" id="tonearm"></div>
+        </div>
+
+        <!-- 信息 -->
+        <div class="music-info">
+            <div class="music-name" id="mTrackName">未知曲目</div>
+            <div class="music-artist" id="mTrackArtist">暗影终端 · 私人收藏</div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="music-progress">
+            <span id="mCurrentTime">00:00</span>
+            <div class="bar-bg" id="mBarBg">
+                <div class="bar-fill" id="mBarFill"></div>
+            </div>
+            <span id="mTotalTime">00:00</span>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="music-controls">
+            <button class="m-btn" onclick="prevTrack()">⏮</button>
+            <button class="m-btn play-btn" id="mPlayBtn" onclick="toggleMusicPlay()">▶</button>
+            <button class="m-btn" onclick="nextTrack()">⏭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 迷你悬浮播放器 -->
+<div class="mini-player" id="miniPlayer" onclick="openMusicPlayer()">
+    <div class="mini-disc" id="miniDisc"></div>
+    <div class="mini-info">
+        <div class="mini-name" id="miniName">正在播放</div>
+        <div class="mini-status" id="miniStatus">后台运行中 · 点击展开</div>
+    </div>
+</div>
+
+<!-- 隐藏的核心 Audio 标签 -->
+<audio id="shadowAudio"></audio>
+
+
+<!-- 暗影极速 · 纵向跑酷 -->
+<div class="rush-overlay" id="rushOverlay">
+    <div class="rush-header">
+        <div class="rush-title">暗影极速 · SHADOW RUSH</div>
+        <div class="rush-close" onclick="closeShadowRush()">✕</div>
+    </div>
+    
+    <div class="rush-score-board">
+        <div>距离：<span id="rushScore">0</span> m</div>
+        <div>金币：<span id="rushCoins">0</span> 🪙</div>
+        <div>最高：<span id="rushHighScore">0</span> m</div>
+    </div>
+
+    <div class="rush-canvas-wrapper">
+        <canvas id="rushCanvas"></canvas>
+    </div>
+
+    <div class="rush-controls">
+        <div class="rush-ctrl-btn" onclick="rushMove('left')">
+            ⬅ <span>左移 (←)</span>
+        </div>
+        <div class="rush-ctrl-btn" onclick="rushMove('right')">
+            ➡ <span>右移 (→)</span>
+        </div>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div class="rush-modal" id="rushModal">
+        <div class="rush-modal-card">
+            <div class="rush-modal-title">车辆损毁</div>
+            <div class="rush-modal-rank" id="rushFinalScore">0 m</div>
+            <div class="rush-modal-desc" id="rushModalDesc">格瑞夫斯正在赶来...</div>
+            <button class="rush-btn" onclick="rushRestart()">重新部署</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- 旅行地球主界面 -->
+<div class="travel-overlay" id="travelOverlay">
+    <div class="travel-header">
+        <div class="travel-title">✈️ 暗影旅行 · TRAVEL</div>
+        <div class="travel-close" onclick="closeTravel()">✕</div>
+    </div>
+    <div class="travel-earth-wrap">
+        <canvas id="travelEarthCanvas" width="380" height="380"></canvas>
+        <div class="travel-hint">点击城市标记 · 出发</div>
+    </div>
+    <div class="travel-stats-bar">
+        <div class="travel-stat">
+            <span class="ts-label">旅行好感</span>
+            <span class="ts-value" id="travelAffectionDisplay">0</span>
+        </div>
+        <div class="travel-stat">
+            <span class="ts-label">已探索</span>
+            <span class="ts-value"><span id="travelVisitedCount">0</span>/6</span>
+        </div>
+        <div class="travel-stat">
+            <span class="ts-label">明信片</span>
+            <span class="ts-value"><span id="travelCollectedCount">0</span>/18</span>
+        </div>
+    </div>
+</div>
+
+<!-- 城市确认卡片 -->
+<div class="travel-city-card-modal" id="travelCityCardModal">
+    <div class="tcc-card">
+        <div class="tcc-emoji" id="tccEmoji">🗼</div>
+        <div class="tcc-name" id="tccName">巴黎</div>
+        <div class="tcc-country" id="tccCountry">France · 法国</div>
+        <div class="tcc-progress" id="tccProgress">明信片 0/3 · 未到访</div>
+        <div class="tcc-buttons">
+            <button class="tcc-btn-cancel" onclick="closeTravelCityCard()">取 消</button>
+            <button class="tcc-btn-go" onclick="departToCity()">出 发</button>
+        </div>
+    </div>
+</div>
+
+<!-- 飞行过场 -->
+<div class="travel-flying" id="travelFlying">
+    <div class="flying-plane">✈️</div>
+    <div class="flying-route" id="flyingRoute">飞往 巴黎...</div>
+</div>
+
+<!-- 城市沉浸式页面 -->
+<div class="travel-city-overlay" id="travelCityOverlay">
+    <div class="city-bg" id="cityBg"></div>
+    <div class="city-top-bar">
+        <div class="city-back-btn" onclick="closeTravelCity()">←</div>
+        <div class="city-page-title" id="cityPageTitle">🗼 巴黎</div>
+        <div class="city-page-empty"></div>
+    </div>
+    <div class="city-bottom-panel">
+        <div class="city-panel-header">
+            <span>明信片收藏 · POSTCARDS</span>
+            <span id="cityPanelCount">0 / 3</span>
+        </div>
+        <div class="city-spots" id="citySpots"></div>
+    </div>
+</div>
+
+<!-- 事件弹窗 -->
+<div class="travel-event-modal" id="travelEventModal">
+    <div class="tve-card">
+        <div class="tve-header">
+            <div class="tve-emoji" id="tveEmoji">🗼</div>
+            <div class="tve-title" id="tveTitle">铁塔亮灯</div>
+        </div>
+        <div class="tve-desc" id="tveDesc"></div>
+        <div class="tve-graves">
+            <div class="tve-graves-name">P. GRAVES</div>
+            <div class="tve-graves-line" id="tveGravesLine"></div>
+        </div>
+        <button class="tve-continue" onclick="closeTravelEvent()">继 续</button>
+    </div>
+</div>
+
+<!-- 隐藏剧情弹窗 -->
+<div class="travel-hidden-modal" id="travelHiddenModal">
+    <div class="tvh-card">
+        <div class="tvh-title" id="tvhTitle">巴黎 · 隐藏剧情</div>
+        <div class="tvh-text" id="tvhText"></div>
+        <div class="tvh-reward">旅行好感 +20</div>
+        <button class="tvh-continue" onclick="closeTravelHidden()">收 下</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
