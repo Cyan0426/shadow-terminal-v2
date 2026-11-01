@@ -10716,20 +10716,26 @@ function updateSFUI() {
 }
 
 // 核心抽卡函数
+// 核心抽卡函数（带合并与转化资金逻辑）
 window.pullSFAgent = function(count) {
     const cost = 500000 * count;
+    
     if (typeof dispatchFunds === 'undefined' || dispatchFunds < cost) {
         alert(`行动资金不足！\n\n本次招募需要 $${cost.toLocaleString('en-US')}，你当前只有 $${dispatchFunds.toLocaleString('en-US')}。`);
         return;
     }
+    
     dispatchFunds -= cost;
     if (typeof renderDispatchFunds === 'function') renderDispatchFunds();
-    if (typeof saveGameState === 'function') saveGameState();
+    
+    // 确保从最新存档读取仓库
+    sfRoster = JSON.parse(localStorage.getItem('sf_roster')) || [];
     
     let results = [];
     let gotSR = false;
     let gotSSR = false;
-    
+    let earnedFunds = 0; // 记录溢出转化来的钱
+
     for (let i = 0; i < count; i++) {
         sfPityCount++;
         let roll = Math.random() * 100;
@@ -10753,70 +10759,117 @@ window.pullSFAgent = function(count) {
         if (selectedRank === 'SSR') gotSSR = true;
         
         const pool = SF_AGENTS_POOL.filter(a => a.rank === selectedRank);
-        const agent = pool[Math.floor(Math.random() * pool.length)];
+        const baseAgent = pool[Math.floor(Math.random() * pool.length)];
         
-        // 👇 核心修复：判断是否已有该干员，进行合并
-        const existingAgentIndex = sfRoster.findIndex(a => a.name === agent.name);
+        // === 核心判定：检查仓库里同名卡的数量 ===
+        const existingAgents = sfRoster.filter(a => a.name === baseAgent.name);
         
-        if (existingAgentIndex !== -1) {
-            // 如果已有，合并属性（升阶）
-            let existingAgent = sfRoster[existingAgentIndex];
-            existingAgent.level = Math.min(existingAgent.level + 1, existingAgent.maxLv);
-            existingAgent.fire += 2;
-            existingAgent.stealth += 2;
-            existingAgent.survive += 2;
-            existingAgent.tactic += 2;
-            
-            // 把合并且升级后的数据推给结果展示
-            results.push({...existingAgent, isMerge: true}); 
+        if (existingAgents.length < 5) {
+            // 没满 5 张，进行合并或新建
+            if (existingAgents.length > 0) {
+                // 合并到已有的第一张卡上（提升属性）
+                const targetAgent = existingAgents[0];
+                targetAgent.level = Math.min(targetAgent.level + 1, targetAgent.maxLv);
+                targetAgent.fire += 2;
+                targetAgent.stealth += 2;
+                targetAgent.survive += 2;
+                targetAgent.tactic += 2;
+                
+                results.push({ ...targetAgent, isMerge: true, mergeCount: existingAgents.length + 1 });
+            } else {
+                // 全新卡牌
+                const newAgent = { ...baseAgent, level: 1, exp: 0, uid: Date.now() + i };
+                sfRoster.push(newAgent);
+                results.push({ ...newAgent, isMerge: false, mergeCount: 1 });
+            }
         } else {
-            // 如果没有，新建
-            const newAgent = {...agent, level: 1, exp: 0, uid: Date.now() + i};
-            sfRoster.push(newAgent);
-            results.push({...newAgent, isMerge: false});
+            // 已经满 5 张了，转化为资金
+            let convertValue = 0;
+            if (selectedRank === 'R') convertValue = 50000;
+            else if (selectedRank === 'SR') convertValue = 200000;
+            else if (selectedRank === 'SSR') convertValue = 1000000;
+            else if (selectedRank === 'UR') convertValue = 5000000;
+            
+            earnedFunds += convertValue;
+            
+            // 记录转换结果
+            results.push({
+                name: baseAgent.name,
+                rank: baseAgent.rank,
+                isConverted: true,
+                convertValue: convertValue
+            });
         }
     }
     
-    localStorage.setItem('sf_pity', sfPityCount.toString());
-    localStorage.setItem('sf_roster', JSON.stringify(sfRoster)); // 保存合并后的数据
+    // 如果产生了转化资金，加给玩家
+    if (earnedFunds > 0) {
+        dispatchFunds += earnedFunds;
+        if (typeof renderDispatchFunds === 'function') renderDispatchFunds();
+    }
     
-    showSFResults(results);
+    localStorage.setItem('sf_pity', sfPityCount.toString());
+    localStorage.setItem('sf_roster', JSON.stringify(sfRoster));
+    if (typeof saveGameState === 'function') saveGameState();
+    
+    showSFResults(results, earnedFunds);
 };
 
-// 展示抽卡结果
-function showSFResults(results) {
+// 展示抽卡结果（带合并、满员变钱的动画UI）
+function showSFResults(results, earnedFunds = 0) {
     document.getElementById('sfGachaScreen').style.display = 'none';
     document.getElementById('sfResultScreen').style.display = 'flex';
     
     const listEl = document.getElementById('sfResultList');
     listEl.innerHTML = '';
     
-    // 保存进仓库
+    // 顶部提示：赚了多少钱
+    if (earnedFunds > 0) {
+        const tip = document.createElement('div');
+        tip.style.cssText = "grid-column: span 2; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 10px; border-radius: 6px; font-size: 13px; text-align: center; margin-bottom: 10px; box-shadow: 0 0 10px rgba(212,175,55,0.2);";
+        tip.innerHTML = `💰 满员溢出干员已转化为行动资金：<span style="font-weight:bold; color:#2ecc71; font-size:15px;">+ $${earnedFunds.toLocaleString()}</span>`;
+        listEl.appendChild(tip);
+    }
+    
+    // 渲染每张卡
     results.forEach((agent, index) => {
-        sfRoster.push(agent); // 待会儿写仓库系统时用
-        
-        // 渲染UI
         const card = document.createElement('div');
-        card.className = `sf-card ${agent.rank}`;
-        // 动画延迟，逐个弹出
-        card.style.animationDelay = `${index * 0.1}s`;
+        card.style.animationDelay = `${index * 0.05}s`;
         
-        card.innerHTML = `
-            <div class="sf-card-header">
-                <div class="sf-card-name">${agent.name}</div>
-                <div class="sf-card-rank">${agent.rank}</div>
-            </div>
-            <div class="sf-card-stats">
-                火力: <span>${agent.fire}</span> | 隐蔽: <span>${agent.stealth}</span><br>
-                生存: <span>${agent.survive}</span> | 战术: <span>${agent.tactic}</span><br>
-                上限: <span>Lv.${agent.maxLv}</span>
-            </div>
-        `;
+        if (agent.isConverted) {
+            // 被转化成钱的卡片
+            card.className = `sf-card ${agent.rank}`;
+            card.style.opacity = '0.85';
+            card.innerHTML = `
+                <div class="sf-card-header">
+                    <div class="sf-card-name">${agent.name}</div>
+                    <div class="sf-card-rank">${agent.rank}</div>
+                </div>
+                <div style="text-align: center; margin-top: 15px; color: #e67e22; font-weight: bold;">
+                    <div style="font-size: 24px; margin-bottom: 5px;">💰</div>
+                    已满5张，自动转化<br>
+                    <span style="color: #2ecc71;">+ $${agent.convertValue.toLocaleString()}</span>
+                </div>
+            `;
+        } else {
+            // 正常抽到/合并的卡片
+            card.className = `sf-card ${agent.rank}`;
+            const mergeTag = agent.isMerge ? `<div style="font-size:10px; color:var(--gold); margin-top:4px; font-weight:bold;">⭐ 合并成功 (仓库已有 ${agent.mergeCount} 张)</div>` : '';
+            card.innerHTML = `
+                <div class="sf-card-header">
+                    <div class="sf-card-name">${agent.name}</div>
+                    <div class="sf-card-rank">${agent.rank}</div>
+                </div>
+                <div class="sf-card-stats">
+                    火力: <span>${agent.fire}</span> | 隐蔽: <span>${agent.stealth}</span><br>
+                    生存: <span>${agent.survive}</span> | 战术: <span>${agent.tactic}</span><br>
+                    等级: <span>Lv.${agent.level} / ${agent.maxLv}</span>
+                    ${mergeTag}
+                </div>
+            `;
+        }
         listEl.appendChild(card);
     });
-    
-    // 存入本地存档
-    localStorage.setItem('sf_roster', JSON.stringify(sfRoster));
 }
 
 // 关闭结果并返回抽卡界面
