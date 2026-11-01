@@ -10621,19 +10621,43 @@ window.closeTravel = function() {
 // 干员数据池
 const SF_AGENTS_POOL = [
     // R 级 (普通)
-    { id: 'r1', name: '新兵-01', rank: 'R', fire: 10, stealth: 10, survive: 10, tactic: 10, maxLv: 40 },
-    { id: 'r2', name: '新兵-02', rank: 'R', fire: 12, stealth: 8, survive: 12, tactic: 8, maxLv: 40 },
-    { id: 'r3', name: '侦察兵', rank: 'R', fire: 8, stealth: 15, survive: 9, tactic: 10, maxLv: 40 },
+    { id: 'r1', name: 'Mira', rank: 'R', fire: 10, stealth: 10, survive: 10, tactic: 10, maxLv: 40 },
+    { id: 'r2', name: 'Echo', rank: 'R', fire: 12, stealth: 8, survive: 12, tactic: 8, maxLv: 40 },
+    { id: 'r3', name: 'Core', rank: 'R', fire: 9, stealth: 15, survive: 9, tactic: 10, maxLv: 40 },
+    { id: 'r4', name: 'Mirage', rank: 'R', fire: 8, stealth: 15, survive: 6, tactic: 11, maxLv: 40 },
+    { id: 'r5', name: 'Bursts', rank: 'R', fire: 13, stealth: 13, survive: 7, tactic: 9, maxLv: 40 },
+    { id: 'r6', name: 'Thirst', rank: 'R', fire: 10, stealth: 10, survive: 9, tactic: 10, maxLv: 40 },
+    { id: 'r7', name: 'Erikson', rank: 'R', fire: 10, stealth: 15, survive: 10, tactic: 11, maxLv: 40 },
+    { id: 'r8', name: 'Vance', rank: 'R', fire: 11, stealth: 14, survive: 9, tactic: 9, maxLv: 40 },
+    { id: 'r9', name: 'Dipaolo', rank: 'R', fire: 12, stealth: 15, survive: 11, tactic: 10, maxLv: 40 },
+    { id: 'r10', name: 'Imitate', rank: 'R', fire: 8, stealth: 12, survive: 9, tactic: 8, maxLv: 40 },
     // SR 级 (精锐)
-    { id: 'sr1', name: '游骑兵', rank: 'SR', fire: 25, stealth: 20, survive: 25, tactic: 20, maxLv: 60 },
-    { id: 'sr2', name: '幽灵', rank: 'SR', fire: 20, stealth: 30, survive: 20, tactic: 20, maxLv: 60 },
-    { id: 'sr3', name: '重装兵', rank: 'SR', fire: 30, stealth: 10, survive: 35, tactic: 15, maxLv: 60 },
+    { id: 'sr1', name: 'Roze', rank: 'SR', fire: 25, stealth: 20, survive: 25, tactic: 20, maxLv: 60 },
+    { id: 'sr2', name: 'Oz', rank: 'SR', fire: 20, stealth: 30, survive: 20, tactic: 20, maxLv: 60 },
+    { id: 'sr3', name: 'Velikan', rank: 'SR', fire: 30, stealth: 10, survive: 35, tactic: 15, maxLv: 60 },
+    { id: 'sr4', name: 'B-Roze', rank: 'SR', fire: 30, stealth: 15, survive: 30, tactic: 15, maxLv: 60 },
+    { id: 'sr5', name: 'Faceless', rank: 'SR', fire: 35, stealth: 10, survive: 30, tactic: 15, maxLv: 60 },
     // SSR 级 (传说)
-    { id: 'ssr1', name: '猎鹰 (Falcon)', rank: 'SSR', fire: 50, stealth: 40, survive: 40, tactic: 50, maxLv: 80 },
-    { id: 'ssr2', name: '毒蛇 (Viper)', rank: 'SSR', fire: 40, stealth: 60, survive: 30, tactic: 50, maxLv: 80 },
-    { id: 'ssr3', name: '铁锤 (Hammer)', rank: 'SSR', fire: 60, stealth: 30, survive: 50, tactic: 40, maxLv: 80 }
+    { id: 'ssr1', name: 'Falcon', rank: 'SSR', fire: 50, stealth: 40, survive: 40, tactic: 50, maxLv: 80 },
+    { id: 'ssr2', name: 'Viper', rank: 'SSR', fire: 40, stealth: 60, survive: 30, tactic: 50, maxLv: 80 },
+    { id: 'ssr3', name: 'Sparrow', rank: 'SSR', fire: 60, stealth: 30, survive: 50, tactic: 40, maxLv: 80 }
 ];
+// ================= UR级 极稀有干员 (仅限黑市兑换) =================
+// 你可以直接把 name 里面的文字改成你想要的名字
+const UR_AGENTS_POOL = [
+    { id: 'ur1', name: 'Ghost(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur2', name: 'Keegan(秘密派遣)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur3', name: 'Krueger(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur4', name: 'Nikto(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur5', name: 'Konig(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur6', name: 'Soap(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur7', name: 'Price(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur8', name: 'Gaz(联合作战)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 },
+    { id: 'ur9', name: 'Reyes(秘密派遣)', rank: 'UR', fire: 80, stealth: 80, survive: 80, tactic: 80, maxLv: 100 }
+    ];
 
+// 黑市兑换价
+const UR_AGENT_COST = 2000;
 // 抽卡状态
 let sfPityCount = parseInt(localStorage.getItem('sf_pity')) || 0; // 距离上次出SSR的抽数
 let sfRoster = JSON.parse(localStorage.getItem('sf_roster')) || []; // 玩家已拥有的干员
@@ -10706,11 +10730,11 @@ window.pullSFAgent = function(count) {
             selectedRank = 'SSR';
             sfPityCount = 0; // 重置保底
         } 
-        // 2. 正常概率判定 (SSR 5%, SR 25%, R 70%)
-        else if (roll < 5) {
+        // 2. 正常概率判定 (SSR 3%, SR 20%, R 77%)
+        else if (roll < 3) {
             selectedRank = 'SSR';
             sfPityCount = 0;
-        } else if (roll < 30) {
+        } else if (roll < 20) {
             selectedRank = 'SR';
         }
         
@@ -10784,20 +10808,23 @@ window.switchSFTab = function(tabName, element) {
     document.querySelectorAll('.sf-tab').forEach(t => t.classList.remove('active'));
     if(element) element.classList.add('active');
 
-    const gachaScreen = document.getElementById('sfGachaScreen');
-    const resultScreen = document.getElementById('sfResultScreen');
-    const rosterScreen = document.getElementById('sfRosterScreen');
+    const screens = ['sfGachaScreen', 'sfResultScreen', 'sfRosterScreen', 'sfMissionScreen', 'sfShopScreen'];
+    screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
 
-    // 核心修复：先判断元素存不存在，再隐藏，防止报错
-    if (gachaScreen) gachaScreen.style.display = 'none';
-    if (resultScreen) resultScreen.style.display = 'none';
-    if (rosterScreen) rosterScreen.style.display = 'none';
-
-    if (tabName === 'gacha' && gachaScreen) {
-        gachaScreen.style.display = 'flex';
-    } else if (tabName === 'roster' && rosterScreen) {
-        rosterScreen.style.display = 'flex';
+    if (tabName === 'gacha') {
+        document.getElementById('sfGachaScreen').style.display = 'flex';
+    } else if (tabName === 'roster') {
+        document.getElementById('sfRosterScreen').style.display = 'flex';
         renderSFRoster();
+    } else if (tabName === 'mission') {
+        document.getElementById('sfMissionScreen').style.display = 'flex';
+        renderSFMissions();
+    } else if (tabName === 'shop') { // 👈 新增黑市切换
+        document.getElementById('sfShopScreen').style.display = 'flex';
+        renderSFShop();
     }
 };
 
@@ -10997,4 +11024,70 @@ window.closeSFResult = function() {
         tabs[2].classList.remove('active');
     }
     updateSFUI();
+};
+// 渲染黑市
+window.renderSFShop = function() {
+    const chipsDisplay = document.getElementById('sfChipsDisplay');
+    if (chipsDisplay) chipsDisplay.textContent = sfChips;
+
+    const listEl = document.getElementById('sfShopList');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+
+    UR_AGENTS_POOL.forEach(urAgent => {
+        // 检查玩家是否已经拥有这个 UR 干员
+        const isOwned = sfRoster.some(a => a.id === urAgent.id);
+        
+        const card = document.createElement('div');
+        card.className = `sf-card UR`;
+        card.innerHTML = `
+            <div class="sf-card-header">
+                <div class="sf-card-name">${urAgent.name}</div>
+                <div class="sf-card-rank">UR</div>
+            </div>
+            <div class="sf-card-stats" style="margin-bottom: 5px;">
+                火力: <span>${urAgent.fire}</span> | 隐蔽: <span>${urAgent.stealth}</span><br>
+                生存: <span>${urAgent.survive}</span> | 战术: <span>${urAgent.tactic}</span><br>
+                等级上限: <span>Lv.${urAgent.maxLv}</span>
+            </div>
+            <button class="sf-shop-btn" 
+                onclick="buyURAgent('${urAgent.id}')"
+                ${isOwned || sfChips < UR_AGENT_COST ? 'disabled' : ''}>
+                ${isOwned ? '已拥有' : `兑换 (${UR_AGENT_COST} 🧩)`}
+            </button>
+        `;
+        listEl.appendChild(card);
+    });
+};
+
+// 购买 UR 干员逻辑
+window.buyURAgent = function(agentId) {
+    if (sfChips < UR_AGENT_COST) return alert('加密芯片不足！');
+    
+    const urAgent = UR_AGENTS_POOL.find(a => a.id === agentId);
+    if (!urAgent) return;
+    
+    // 检查是否已拥有
+    if (sfRoster.some(a => a.id === agentId)) {
+        return alert('你已经拥有这名终极干员了。');
+    }
+
+    if (confirm(`确认消耗 ${UR_AGENT_COST} 枚加密芯片，兑换终极干员【${urAgent.name}】吗？`)) {
+        // 扣芯片
+        sfChips -= UR_AGENT_COST;
+        localStorage.setItem('sf_chips', sfChips.toString());
+        
+        // 入库
+        const newAgent = { ...urAgent, stars: 0, level: 1, exp: 0, uid: Date.now() };
+        sfRoster.push(newAgent);
+        localStorage.setItem('sf_roster', JSON.stringify(sfRoster));
+        
+        renderSFShop();
+        alert(`兑换成功！【${urAgent.name}】已加入你的特种部队。`);
+        
+        if (typeof triggerGravesAltMessage === 'function') {
+            triggerGravesAltMessage(`你居然把 ${urAgent.name} 弄到手了？你倒是舍得花钱。`);
+        }
+    }
 };

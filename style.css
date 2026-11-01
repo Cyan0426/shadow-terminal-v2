@@ -4729,3 +4729,35 @@ body .phone-mockup .header-name {
     color: var(--text-primary); padding: 8px; border-radius: 4px;
     margin-bottom: 8px; outline: none; font-family: inherit;
 }
+/* UR 级卡牌专属特效 */
+.sf-card.UR {
+    border: 1px solid #ff3333;
+    background: linear-gradient(135deg, rgba(255, 51, 51, 0.1) 0%, var(--bg-card) 100%);
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.3), inset 0 0 10px rgba(255, 51, 51, 0.2);
+    animation: urGlow 2s infinite alternate;
+}
+.sf-card.UR .sf-card-name {
+    color: #ff5555;
+    text-shadow: 0 0 10px rgba(255, 85, 85, 0.6);
+}
+.sf-card.UR .sf-card-rank {
+    background: #ff3333;
+    color: #fff;
+}
+
+@keyframes urGlow {
+    from { box-shadow: 0 0 10px rgba(255, 51, 51, 0.2); }
+    to { box-shadow: 0 0 25px rgba(255, 51, 51, 0.6); }
+}
+
+/* 黑市界面 */
+.sf-shop-screen { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.sf-shop-list { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-right: 5px; padding-bottom: 20px; scrollbar-width: none; }
+.sf-shop-list::-webkit-scrollbar { display: none; }
+.sf-shop-btn {
+    background: rgba(224, 62, 62, 0.1); border: 1px solid #e03e3e;
+    color: #e03e3e; padding: 8px; border-radius: 4px; margin-top: 8px;
+    font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; width: 100%; font-family: inherit;
+}
+.sf-shop-btn:hover { background: #e03e3e; color: #fff; }
+.sf-shop-btn:disabled { background: #1a1a22; color: var(--text-muted); border-color: #2a2a35; cursor: not-allowed; }

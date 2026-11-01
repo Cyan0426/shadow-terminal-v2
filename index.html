@@ -1977,6 +1977,7 @@
         <div class="sf-tab active" onclick="switchSFTab('gacha', this)">招募中心</div>
         <div class="sf-tab" onclick="switchSFTab('roster', this)">干员名册</div>
         <div class="sf-tab" onclick="switchSFTab('mission', this)">特种行动</div>
+        <div class="sf-tab" onclick="switchSFTab('shop', this)">暗影黑市</div></div>
     </div>
 
     <!-- 界面 1：抽卡主界面 -->
@@ -2009,7 +2010,20 @@
             <!-- 任务列表由 JS 渲染 -->
         </div>
     </div>
+    <!-- 界面 5：暗影黑市 (默认隐藏) -->
+<div class="sf-shop-screen" id="sfShopScreen" style="display: none;">
+    <!-- 黑市顶部：芯片余额展示 -->
+    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(224, 62, 62, 0.1); border: 1px solid #e03e3e; border-radius: 8px; margin-bottom: 10px;">
+        <div style="color: #e03e3e; font-weight: bold; font-size: 14px;">🔴 暗影黑市</div>
+        <div style="color: var(--gold); font-weight: bold;">加密芯片: <span id="sfChipsDisplay">0</span> 🧩</div>
+    </div>
+    
+    <div class="sf-shop-list" id="sfShopList">
+        <!-- 商品列表由 JS 渲染 -->
+    </div>
 </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
