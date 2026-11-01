@@ -10804,6 +10804,7 @@ window.closeSFResult = function() {
     updateSFUI();
 };
 // 切换 Tab
+// 统一切换 Tab
 window.switchSFTab = function(tabName, element) {
     document.querySelectorAll('.sf-tab').forEach(t => t.classList.remove('active'));
     if(element) element.classList.add('active');
@@ -10822,7 +10823,7 @@ window.switchSFTab = function(tabName, element) {
     } else if (tabName === 'mission') {
         document.getElementById('sfMissionScreen').style.display = 'flex';
         renderSFMissions();
-    } else if (tabName === 'shop') { // 👈 新增黑市切换
+    } else if (tabName === 'shop') { 
         document.getElementById('sfShopScreen').style.display = 'flex';
         renderSFShop();
     }
