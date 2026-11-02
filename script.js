@@ -10864,15 +10864,54 @@ function showSFResults(results, earnedFunds = 0, earnedChips = 0) {
     document.getElementById('sfResultScreen').style.display = 'flex';
     
     const listEl = document.getElementById('sfResultList');
-    listEl.innerHTML = '';
     
+    // 先清空之前的内容，防止多次抽卡残留
+    listEl.innerHTML = ''; 
+
+    // 🌟 核心修复 1：在结果页绝对定位一个悬浮的关闭按钮
+    const closeBtn = document.createElement('div');
+    closeBtn.innerHTML = '✕ 确认入库';
+    closeBtn.style.cssText = `
+        position: absolute; 
+        top: -5px; 
+        right: 15px; 
+        background: rgba(212, 175, 55, 0.9); 
+        color: #000; 
+        padding: 6px 12px; 
+        border-radius: 20px; 
+        font-size: 12px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        z-index: 999; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        transition: all 0.2s;
+    `;
+    // 注意：原本页面里的那行固定按钮可能被挤没了，这里用 JS 动态加，保证永远在右上角
+    closeBtn.onclick = function() { closeSFResult(); };
+    closeBtn.onmouseover = function() { this.style.transform = 'scale(1.05)'; };
+    closeBtn.onmouseout = function() { this.style.transform = 'scale(1)'; };
+    
+    // 将按钮挂载到父元素上（也就是 sfResultScreen）
+    const resultScreen = document.getElementById('sfResultScreen');
+    if (!document.getElementById('dynamic-sf-close')) {
+        closeBtn.id = 'dynamic-sf-close';
+        resultScreen.appendChild(closeBtn);
+    }
+
+    // 渲染转化提示（加上了“仅为记录”的说明，防止玩家误解）
     if (earnedFunds > 0 || earnedChips > 0) {
         const tip = document.createElement('div');
         tip.style.cssText = "grid-column: span 2; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold); color: var(--gold); padding: 10px; border-radius: 6px; font-size: 13px; text-align: center; margin-bottom: 10px; box-shadow: 0 0 10px rgba(212,175,55,0.2);";
-        tip.innerHTML = `💰 满员溢出转化：<br><span style="font-weight:bold; color:#2ecc71; font-size:15px;">+ $${earnedFunds.toLocaleString()}</span> 行动资金<br><span style="font-weight:bold; color:#e03e3e; font-size:14px;">+ ${earnedChips} 枚加密芯片 🧩</span>`;
+        tip.innerHTML = `
+            <div style="font-size:12px; color:#aaa; margin-bottom:5px;">(此提示仅为记录，非按钮)</div>
+            💰 满员溢出转化：<br>
+            <span style="font-weight:bold; color:#2ecc71; font-size:15px;">+ $${earnedFunds.toLocaleString()}</span> 行动资金<br>
+            <span style="font-weight:bold; color:#e03e3e; font-size:14px;">+ ${earnedChips} 枚加密芯片 🧩</span>
+        `;
         listEl.appendChild(tip);
     }
     
+    // 渲染卡片
     results.forEach((agent, index) => {
         const card = document.createElement('div');
         card.style.animationDelay = `${index * 0.05}s`;
@@ -10914,8 +10953,22 @@ function showSFResults(results, earnedFunds = 0, earnedChips = 0) {
 
 // 关闭结果并返回抽卡界面
 window.closeSFResult = function() {
-    document.getElementById('sfResultScreen').style.display = 'none';
-    document.getElementById('sfGachaScreen').style.display = 'flex';
+    const resScreen = document.getElementById('sfResultScreen');
+    const gachaScreen = document.getElementById('sfGachaScreen');
+    if (resScreen) resScreen.style.display = 'none';
+    if (gachaScreen) gachaScreen.style.display = 'flex';
+    
+    // 移除悬浮的关闭按钮
+    const closeBtn = document.getElementById('dynamic-sf-close');
+    if (closeBtn) closeBtn.remove();
+
+    // 把顶部 Tab 高亮重置到招募中心
+    const tabs = document.querySelectorAll('.sf-tab');
+    if (tabs.length > 0) {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabs[0].classList.add('active');
+    }
+    
     updateSFUI();
 };
 // 切换 Tab
